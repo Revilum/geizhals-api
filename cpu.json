@@ -1,0 +1,811 @@
+[
+  {
+    name: 'Intel Core i5-11400F, 6C/12T, 2.60-4.40GHz, boxed (BX8070811400F)',
+    link: 'https://geizhals.de/intel-core-i5-11400f-bx8070811400f-a2492594.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/25/94/2492594-n0.jpg',
+    price: '175.36€',
+    offers: 32,
+    bestPriceOffer: { seller: 'Caseking.de', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'nein',
+      TDP: '65W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '2.60GHz',
+      Turbotakt: '4.40GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual Channel PC4-25600U (DDR4-3200)'
+    },
+    rating: {
+      stars: 5,
+      ratings: 1,
+      link: 'https://geizhals.de/?sr=2492594,-1'
+    },
+    reviews: { reviews: 7 }
+  },
+  {
+    name: 'Intel Core i5-11400, 6C/12T, 2.60-4.40GHz, boxed (BX8070811400)',
+    link: 'https://geizhals.de/intel-core-i5-11400-bx8070811400-a2492590.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/25/90/2492590-n0.jpg',
+    price: '183.94€',
+    offers: 40,
+    bestPriceOffer: { seller: 'Caseking.de', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'Intel UHD Graphics 730 (iGPU), 24EU/192SP, 0.35-1.30GHz',
+      TDP: '65W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '2.60GHz',
+      Turbotakt: '4.40GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 5,
+      ratings: 3,
+      link: 'https://geizhals.de/?sr=2492590,-1'
+    },
+    reviews: {
+      reviews: 1,
+      score: 75,
+      link: 'https://geizhals.de/intel-core-i5-11400-bx8070811400-a2492590.html?hloc=at&hloc=de#reports'
+    }
+  },
+  {
+    name: 'Intel Core i5-10400F (G1), 6C/12T, 2.90-4.30GHz, boxed (BX8070110400F/SRH3D)',
+    link: 'https://geizhals.de/intel-core-i5-10400f-bx8070110400f-a2290965.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/09/65/2290965-n0.jpg',
+    price: '152.53€',
+    offers: 59,
+    bestPriceOffer: { seller: 'Proshop.de', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'nein',
+      TDP: '65W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '2.90GHz',
+      Turbotakt: '4.30GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual Channel PC4-21300U (DDR4-2666)'
+    },
+    rating: {
+      stars: 4.9,
+      ratings: 36,
+      link: 'https://geizhals.de/?sr=2290965,-1'
+    },
+    reviews: { reviews: 4 }
+  },
+  {
+    name: 'Intel Core i9-10850K, 10C/20T, 3.60-5.20GHz, boxed ohne Kühler (BX8070110850K)',
+    link: 'https://geizhals.de/intel-core-i9-10850k-bx8070110850k-a2341363.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/13/63/2341363-n0.jpg',
+    price: '376.00€',
+    offers: 45,
+    bestPriceOffer: { seller: 'Mindfactory', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.20GHz',
+      TDP: '125W',
+      Kerne: '10',
+      Threads: '20',
+      Basistakt: '3.60GHz',
+      Turbotakt: '5.20GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 4.9,
+      ratings: 14,
+      link: 'https://geizhals.de/?sr=2341363,-1'
+    },
+    reviews: { reviews: 6 }
+  },
+  {
+    name: 'Intel Core i7-11700K, 8C/16T, 3.60-5.00GHz, boxed ohne Kühler (BX8070811700K)',
+    link: 'https://geizhals.de/intel-core-i7-11700k-bx8070811700k-a2484266.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/42/66/2484266-n0.jpg',
+    price: '384.77€',
+    offers: 58,
+    bestPriceOffer: { seller: 'CSV-Direct.de', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'Intel UHD Graphics 750 (iGPU), 32EU/256SP, 0.35-1.30GHz',
+      TDP: '125W',
+      Kerne: '8',
+      Threads: '16',
+      Basistakt: '3.60GHz',
+      Turbotakt: '5.00GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 4.6,
+      ratings: 9,
+      link: 'https://geizhals.de/?sr=2484266,-1'
+    },
+    reviews: { reviews: 4 }
+  },
+  {
+    name: 'Intel Core i7-10700K, 8C/16T, 3.80-5.10GHz, boxed ohne Kühler (BX8070110700K)',
+    link: 'https://geizhals.de/intel-core-i7-10700k-bx8070110700k-a2290993.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/09/93/2290993-n0.jpg',
+    price: '309.00€',
+    offers: 74,
+    bestPriceOffer: { seller: 'Mindfactory', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.20GHz',
+      TDP: '125W',
+      Kerne: '8',
+      Threads: '16',
+      Basistakt: '3.80GHz',
+      Turbotakt: '5.10GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 5,
+      ratings: 56,
+      link: 'https://geizhals.de/?sr=2290993,-1'
+    },
+    reviews: {
+      reviews: 1,
+      score: 90,
+      link: 'https://geizhals.de/intel-core-i7-10700k-bx8070110700k-a2290993.html?hloc=at&hloc=de#reports'
+    }
+  },
+  {
+    name: 'Intel Core i9-11900K, 8C/16T, 3.50-5.30GHz, boxed ohne Kühler (BX8070811900K)',
+    link: 'https://geizhals.de/intel-core-i9-11900k-bx8070811900k-a2484160.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/41/60/2484160-n0.jpg',
+    price: '599.38€',
+    offers: 29,
+    bestPriceOffer: { seller: 'Mindfactory', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'Intel UHD Graphics 750 (iGPU), 32EU/256SP, 0.35-1.30GHz',
+      TDP: '125W',
+      Kerne: '8',
+      Threads: '16',
+      Basistakt: '3.50GHz',
+      Turbotakt: '5.30GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 3.3,
+      ratings: 3,
+      link: 'https://geizhals.de/?sr=2484160,-1'
+    },
+    reviews: {
+      reviews: 3,
+      score: 61,
+      link: 'https://geizhals.de/intel-core-i9-11900k-bx8070811900k-a2484160.html?hloc=at&hloc=de#reports'
+    }
+  },
+  {
+    name: 'Intel Core i9-10900K, 10C/20T, 3.70-5.30GHz, boxed ohne Kühler (BX8070110900K)',
+    link: 'https://geizhals.de/intel-core-i9-10900k-bx8070110900k-a2291009.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/10/09/2291009-n0.jpg',
+    price: '479.00€',
+    offers: 38,
+    bestPriceOffer: { seller: 'Proshop.de', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.20GHz',
+      TDP: '125W',
+      Kerne: '10',
+      Threads: '20',
+      Basistakt: '3.70GHz',
+      Turbotakt: '5.30GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 5,
+      ratings: 3,
+      link: 'https://geizhals.de/?sr=2291009,-1'
+    },
+    reviews: {
+      reviews: 5,
+      score: 80,
+      link: 'https://geizhals.de/intel-core-i9-10900k-bx8070110900k-a2291009.html?hloc=at&hloc=de#reports'
+    }
+  },
+  {
+    name: 'Intel Core i3-10100F, 4C/8T, 3.60-4.30GHz, boxed (BX8070110100F)',
+    link: 'https://geizhals.de/intel-core-i3-10100f-bx8070110100f-a2393927.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/39/27/2393927-n0.jpg',
+    price: '101.34€',
+    offers: 47,
+    bestPriceOffer: { seller: 'Caseking.de', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'nein',
+      TDP: '65W',
+      Kerne: '4',
+      Threads: '8',
+      Basistakt: '3.60GHz',
+      Turbotakt: '4.30GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual Channel PC4-21300U (DDR4-2666)'
+    },
+    rating: {
+      stars: 4.9,
+      ratings: 11,
+      link: 'https://geizhals.de/?sr=2393927,-1'
+    },
+    reviews: {}
+  },
+  {
+    name: 'Intel Core i5-11600K, 6C/12T, 3.90-4.90GHz, boxed ohne Kühler (BX8070811600K)',
+    link: 'https://geizhals.de/intel-core-i5-11600k-bx8070811600k-a2484489.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/44/89/2484489-n0.jpg',
+    price: '249.00€',
+    offers: 56,
+    bestPriceOffer: { seller: 'Mindfactory', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'Intel UHD Graphics 750 (iGPU), 32EU/256SP, 0.35-1.30GHz',
+      TDP: '125W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '3.90GHz',
+      Turbotakt: '4.90GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 0,
+      ratings: 0,
+      link: 'https://geizhals.de/?sr=2484489,-1'
+    },
+    reviews: {
+      reviews: 1,
+      score: 85,
+      link: 'https://geizhals.de/intel-core-i5-11600k-bx8070811600k-a2484489.html?hloc=at&hloc=de#reports'
+    }
+  },
+  {
+    name: 'Intel Core i7-11700, 8C/16T, 2.50-4.90GHz, boxed (BX8070811700)',
+    link: 'https://geizhals.de/intel-core-i7-11700-bx8070811700-a2484442.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/44/42/2484442-n0.jpg',
+    price: '336.35€',
+    offers: 45,
+    bestPriceOffer: { seller: 'Mindfactory', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'Intel UHD Graphics 750 (iGPU), 32EU/256SP, 0.35-1.30GHz',
+      TDP: '65W',
+      Kerne: '8',
+      Threads: '16',
+      Basistakt: '2.50GHz',
+      Turbotakt: '4.90GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 5,
+      ratings: 2,
+      link: 'https://geizhals.de/?sr=2484442,-1'
+    },
+    reviews: { reviews: 1 }
+  },
+  {
+    name: 'Intel Core i9-9900K, 8C/16T, 3.60-5.00GHz, boxed ohne Kühler (BX806849900K)',
+    link: 'https://geizhals.de/intel-core-i9-9900k-bx806849900k-a2337265.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/72/65/2337265-n0.jpg',
+    price: '319.00€',
+    offers: 61,
+    bestPriceOffer: { seller: 'Amazon.de', country: 'DE' },
+    properties: {
+      Sockel: '1151 v2 (LGA)',
+      Codename: 'Coffee Lake-R',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.20GHz',
+      TDP: '95W',
+      Kerne: '8',
+      Threads: '16',
+      Basistakt: '3.60GHz',
+      Turbotakt: '5.00GHz',
+      SMT: 'ja (Intel Hyper-Threading)'
+    },
+    rating: {
+      stars: 5,
+      ratings: 14,
+      link: 'https://geizhals.de/?sr=2337265,-1'
+    },
+    reviews: {
+      reviews: 3,
+      score: 83,
+      link: 'https://geizhals.de/intel-core-i9-9900k-bx806849900k-a2337265.html?hloc=at&hloc=de#reports'
+    }
+  },
+  {
+    name: 'Intel Core i5-11500, 6C/12T, 2.70-4.60GHz, boxed (BX8070811500)',
+    link: 'https://geizhals.de/intel-core-i5-11500-bx8070811500-a2492581.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/25/81/2492581-n0.jpg',
+    price: '208.06€',
+    offers: 33,
+    bestPriceOffer: { seller: 'Caseking.de', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'Intel UHD Graphics 750 (iGPU), 32EU/256SP, 0.35-1.30GHz',
+      TDP: '65W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '2.70GHz',
+      Turbotakt: '4.60GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 0,
+      ratings: 0,
+      link: 'https://geizhals.de/?sr=2492581,-1'
+    },
+    reviews: { reviews: 1 }
+  },
+  {
+    name: 'Intel Core i7-10700, 8C/16T, 2.90-4.80GHz, boxed (BX8070110700)',
+    link: 'https://geizhals.de/intel-core-i7-10700-bx8070110700-a2290986.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/09/86/2290986-n0.jpg',
+    price: '282.92€',
+    offers: 64,
+    bestPriceOffer: { seller: 'Server Source Technology', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.20GHz',
+      TDP: '65W',
+      Kerne: '8',
+      Threads: '16',
+      Basistakt: '2.90GHz',
+      Turbotakt: '4.80GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 4.7,
+      ratings: 7,
+      link: 'https://geizhals.de/?sr=2290986,-1'
+    },
+    reviews: { reviews: 2 }
+  },
+  {
+    name: 'Intel Core i3-10100, 4C/8T, 3.60-4.30GHz, boxed (BX8070110100)',
+    link: 'https://geizhals.de/intel-core-i3-10100-bx8070110100-a2290956.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/09/56/2290956-n0.jpg',
+    price: '138.00€',
+    offers: 46,
+    bestPriceOffer: { seller: 'x-kom', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.10GHz',
+      TDP: '65W',
+      Kerne: '4',
+      Threads: '8',
+      Basistakt: '3.60GHz',
+      Turbotakt: '4.30GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 4.8,
+      ratings: 13,
+      link: 'https://geizhals.de/?sr=2290956,-1'
+    },
+    reviews: { reviews: 3 }
+  },
+  {
+    name: 'Intel Core i5-10400 (G1), 6C/12T, 2.90-4.30GHz, boxed (BX8070110400/SRH3C)',
+    link: 'https://geizhals.de/intel-core-i5-10400-bx8070110400-a2290964.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/09/64/2290964-n0.jpg',
+    price: '184.67€',
+    offers: 43,
+    bestPriceOffer: { seller: 'AGEM CZ', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.10GHz',
+      TDP: '65W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '2.90GHz',
+      Turbotakt: '4.30GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 5,
+      ratings: 7,
+      link: 'https://geizhals.de/?sr=2290964,-1'
+    },
+    reviews: { reviews: 1 }
+  },
+  {
+    name: 'Intel Core i5-11600KF, 6C/12T, 3.90-4.90GHz, boxed ohne Kühler (BX8070811600KF)',
+    link: 'https://geizhals.de/intel-core-i5-11600kf-bx8070811600kf-a2484506.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/45/06/2484506-n0.jpg',
+    price: '236.99€',
+    offers: 40,
+    bestPriceOffer: { seller: 'Mindfactory', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'nein',
+      TDP: '125W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '3.90GHz',
+      Turbotakt: '4.90GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual Channel PC4-25600U (DDR4-3200)'
+    },
+    rating: {
+      stars: 0,
+      ratings: 0,
+      link: 'https://geizhals.de/?sr=2484506,-1'
+    },
+    reviews: {}
+  },
+  {
+    name: 'Intel Core i9-9900KF, 8C/16T, 3.60-5.00GHz, boxed ohne Kühler (BX80684I99900KF)',
+    link: 'https://geizhals.de/intel-core-i9-9900kf-bx80684i99900kf-a1968098.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/80/98/1968098-n0.jpg',
+    price: '292.04€',
+    offers: 56,
+    bestPriceOffer: { seller: 'BA-Computer', country: 'AT' },
+    properties: {
+      Sockel: '1151 v2 (LGA)',
+      Codename: 'Coffee Lake-R',
+      Grafik: 'nein',
+      TDP: '95W',
+      Kerne: '8',
+      Threads: '16',
+      Basistakt: '3.60GHz',
+      Turbotakt: '5.00GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual Channel PC4-21300U (DDR4-2666)'
+    },
+    rating: {
+      stars: 4.9,
+      ratings: 13,
+      link: 'https://geizhals.de/?sr=1968098,-1'
+    },
+    reviews: {}
+  },
+  {
+    name: 'Intel Core i5-11600, 6C/12T, 2.80-4.80GHz, boxed (BX8070811600)',
+    link: 'https://geizhals.de/intel-core-i5-11600-bx8070811600-a2492572.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/25/72/2492572-n0.jpg',
+    price: '229.67€',
+    offers: 23,
+    bestPriceOffer: { seller: 'BA-Computer', country: 'AT' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'Intel UHD Graphics 750 (iGPU), 32EU/256SP, 0.35-1.30GHz',
+      TDP: '65W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '2.80GHz',
+      Turbotakt: '4.80GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 0,
+      ratings: 0,
+      link: 'https://geizhals.de/?sr=2492572,-1'
+    },
+    reviews: { reviews: 1 }
+  },
+  {
+    name: 'Intel Core i7-9700K, 8C/8T, 3.60-4.90GHz, boxed ohne Kühler (BX80684I79700K)',
+    link: 'https://geizhals.de/intel-core-i7-9700k-bx80684i79700k-a1870100.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/01/00/1870100-n0.jpg',
+    price: '249.00€',
+    offers: 81,
+    bestPriceOffer: { seller: 'sbdirect24', country: 'DE' },
+    properties: {
+      Sockel: '1151 v2 (LGA)',
+      Codename: 'Coffee Lake-R',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.20GHz',
+      TDP: '95W',
+      Kerne: '8',
+      Threads: '8',
+      Basistakt: '3.60GHz',
+      Turbotakt: '4.90GHz',
+      SMT: 'nein',
+      Speichercontroller: 'Dual Channel'
+    },
+    rating: {
+      stars: 4.9,
+      ratings: 119,
+      link: 'https://geizhals.de/?sr=1870100,-1'
+    },
+    reviews: { reviews: 15 }
+  },
+  {
+    name: 'Intel Core i5-10600K, 6C/12T, 4.10-4.80GHz, boxed ohne Kühler (BX8070110600K)',
+    link: 'https://geizhals.de/intel-core-i5-10600k-bx8070110600k-a2290983.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/09/83/2290983-n0.jpg',
+    price: '205.00€',
+    offers: 71,
+    bestPriceOffer: { seller: 'Mindfactory', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.20GHz',
+      TDP: '125W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '4.10GHz',
+      Turbotakt: '4.80GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 4.8,
+      ratings: 12,
+      link: 'https://geizhals.de/?sr=2290983,-1'
+    },
+    reviews: {
+      reviews: 3,
+      score: 80,
+      link: 'https://geizhals.de/intel-core-i5-10600k-bx8070110600k-a2290983.html?hloc=at&hloc=de#reports'
+    }
+  },
+  {
+    name: 'Intel Pentium Gold G5420, 2C/4T, 3.80GHz, boxed (BX80684G5420)',
+    link: 'https://geizhals.de/intel-pentium-gold-g5420-bx80684g5420-a2058227.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/82/27/2058227-n0.jpg',
+    price: '91.20€',
+    offers: 2,
+    bestPriceOffer: { seller: 'Electropolis_Online', country: 'DE' },
+    properties: {
+      Sockel: '1151 v2 (LGA)',
+      Codename: 'Coffee Lake-S',
+      Grafik: 'Intel UHD Graphics 610 (iGPU), 12EU/96SP, 0.35-1.05GHz',
+      TDP: '54W',
+      Kerne: '2',
+      Threads: '4',
+      Basistakt: '3.80GHz',
+      Turbotakt: 'N/A',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual'
+    },
+    rating: {
+      stars: 0,
+      ratings: 0,
+      link: 'https://geizhals.de/?sr=2058227,-1'
+    },
+    reviews: {}
+  },
+  {
+    name: 'Intel Core i9-10900KF, 10C/20T, 3.70-5.30GHz, boxed ohne Kühler (BX8070110900KF)',
+    link: 'https://geizhals.de/intel-core-i9-10900kf-bx8070110900kf-a2291013.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/10/13/2291013-n0.jpg',
+    price: '439.90€',
+    offers: 40,
+    bestPriceOffer: { seller: 'ComStern.de', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'nein',
+      TDP: '125W',
+      Kerne: '10',
+      Threads: '20',
+      Basistakt: '3.70GHz',
+      Turbotakt: '5.30GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual Channel PC4-23466U (DDR4-2933)'
+    },
+    rating: {
+      stars: 5,
+      ratings: 1,
+      link: 'https://geizhals.de/?sr=2291013,-1'
+    },
+    reviews: {}
+  },
+  {
+    name: 'Intel Core i5-11400F, 6C/12T, 2.60-4.40GHz, tray (CM8070804497016)',
+    link: 'https://geizhals.de/intel-core-i5-11400f-cm8070804497016-a2492645.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/26/45/2492645-n0.jpg',
+    price: '169.19€',
+    offers: 1,
+    bestPriceOffer: { seller: 'Caseking.de', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'nein',
+      TDP: '65W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '2.60GHz',
+      Turbotakt: '4.40GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual Channel PC4-25600U (DDR4-3200)'
+    },
+    rating: {
+      stars: 0,
+      ratings: 0,
+      link: 'https://geizhals.de/?sr=2492645,-1'
+    },
+    reviews: { reviews: 7 }
+  },
+  {
+    name: 'Intel Core i7-10700KF, 8C/16T, 3.80-5.10GHz, boxed ohne Kühler (BX8070110700KF)',
+    link: 'https://geizhals.de/intel-core-i7-10700kf-bx8070110700kf-a2290994.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/09/94/2290994-n0.jpg',
+    price: '298.50€',
+    offers: 72,
+    bestPriceOffer: { seller: 'Mindfactory', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Comet Lake-S',
+      Grafik: 'nein',
+      TDP: '125W',
+      Kerne: '8',
+      Threads: '16',
+      Basistakt: '3.80GHz',
+      Turbotakt: '5.10GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual Channel PC4-23466U (DDR4-2933)'
+    },
+    rating: {
+      stars: 5,
+      ratings: 5,
+      link: 'https://geizhals.de/?sr=2290994,-1'
+    },
+    reviews: {}
+  },
+  {
+    name: 'Intel Core i7-11700F, 8C/16T, 2.50-4.90GHz, boxed (BX8070811700F)',
+    link: 'https://geizhals.de/intel-core-i7-11700f-bx8070811700f-a2484471.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/44/71/2484471-n0.jpg',
+    price: '313.04€',
+    offers: 41,
+    bestPriceOffer: { seller: 'barax', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'nein',
+      TDP: '65W',
+      Kerne: '8',
+      Threads: '16',
+      Basistakt: '2.50GHz',
+      Turbotakt: '4.90GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: 'Dual Channel PC4-25600U (DDR4-3200)'
+    },
+    rating: {
+      stars: 0,
+      ratings: 0,
+      link: 'https://geizhals.de/?sr=2484471,-1'
+    },
+    reviews: {}
+  },
+  {
+    name: 'Intel Core i3-9100F, 4C/4T, 3.60-4.20GHz, boxed (BX80684I39100F)',
+    link: 'https://geizhals.de/intel-core-i3-9100f-bx80684i39100f-a2056671.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/66/71/2056671-n0.jpg',
+    price: '129.90€',
+    offers: 42,
+    bestPriceOffer: { seller: 'HiQ24', country: 'DE' },
+    properties: {
+      Sockel: '1151 v2 (LGA)',
+      Codename: 'Coffee Lake-R',
+      Grafik: 'nein',
+      TDP: '65W',
+      Kerne: '4',
+      Threads: '4',
+      Basistakt: '3.60GHz',
+      Turbotakt: '4.20GHz',
+      SMT: 'nein',
+      Speichercontroller: 'Dual Channel PC4-19200U (DDR4-2400)',
+      'ECC-Unterstützung': 'ja'
+    },
+    rating: {
+      stars: 4.7,
+      ratings: 27,
+      link: 'https://geizhals.de/?sr=2056671,-1'
+    },
+    reviews: {}
+  },
+  {
+    name: 'Intel Core i5-11600, 6C/12T, 2.80-4.80GHz, tray (CM8070804491513)',
+    link: 'https://geizhals.de/intel-core-i5-11600-cm8070804491513-a2492649.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/26/49/2492649-n0.jpg',
+    price: '218.90€',
+    offers: 13,
+    bestPriceOffer: { seller: 'Alternate', country: 'DE' },
+    properties: {
+      Sockel: '1200 (LGA)',
+      Codename: 'Rocket Lake-S',
+      Grafik: 'Intel UHD Graphics 750 (iGPU), 32EU/256SP, 0.35-1.30GHz',
+      TDP: '65W',
+      Kerne: '6',
+      Threads: '12',
+      Basistakt: '2.80GHz',
+      Turbotakt: '4.80GHz',
+      SMT: 'ja (Intel Hyper-Threading)',
+      Speichercontroller: ''
+    },
+    rating: {
+      stars: 0,
+      ratings: 0,
+      link: 'https://geizhals.de/?sr=2492649,-1'
+    },
+    reviews: { reviews: 1 }
+  },
+  {
+    name: 'Intel Core i5-9400F, 6C/6T, 2.90-4.10GHz, boxed (BX80684I59400F)',
+    link: 'https://geizhals.de/intel-core-i5-9400f-bx80684i59400f-a1968119.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/81/19/1968119-n0.jpg',
+    price: '134.00€',
+    offers: 71,
+    bestPriceOffer: { seller: 'voelkner.de', country: 'DE' },
+    properties: {
+      Sockel: '1151 v2 (LGA)',
+      Codename: 'Coffee Lake-R',
+      Grafik: 'nein',
+      TDP: '65W',
+      Kerne: '6',
+      Threads: '6',
+      Basistakt: '2.90GHz',
+      Turbotakt: '4.10GHz',
+      SMT: 'nein',
+      Speichercontroller: 'Dual Channel PC4-21300U (DDR4-2666)',
+      'ECC-Unterstützung': 'nein'
+    },
+    rating: {
+      stars: 5,
+      ratings: 45,
+      link: 'https://geizhals.de/?sr=1968119,-1'
+    },
+    reviews: { reviews: 2 }
+  },
+  {
+    name: 'Intel Core i5-9600K, 6C/6T, 3.70-4.60GHz, boxed ohne Kühler (BX80684I59600K)',
+    link: 'https://geizhals.de/intel-core-i5-9600k-bx80684i59600k-a1870105.html?hloc=at&hloc=de',
+    image: 'https://gzhls.at/i/01/05/1870105-n0.jpg',
+    price: '174.00€',
+    offers: 72,
+    bestPriceOffer: { seller: 'Mindfactory', country: 'DE' },
+    properties: {
+      Sockel: '1151 v2 (LGA)',
+      Codename: 'Coffee Lake-R',
+      Grafik: 'Intel UHD Graphics 630 (iGPU), 24EU/192SP, 0.35-1.15GHz',
+      TDP: '95W',
+      Kerne: '6',
+      Threads: '6',
+      Basistakt: '3.70GHz',
+      Turbotakt: '4.60GHz',
+      SMT: 'nein',
+      Speichercontroller: 'Dual Channel'
+    },
+    rating: {
+      stars: 5,
+      ratings: 120,
+      link: 'https://geizhals.de/?sr=1870105,-1'
+    },
+    reviews: { reviews: 12 }
+  }
+]

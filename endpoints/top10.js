@@ -11,8 +11,9 @@ async function getTop10() {
 		var obj = new Object()
 		obj.name = $(this).find('.line-clamp > a').text().trim()
 		obj.link = baseurl + $(this).find('.line-clamp > a').attr('href')
-		obj.price = $(this).find('.gh_price').text()
-		obj.img = $(this).find('.t10img > a > img').attr('src')
+		var price = $(this).find('.gh_price').text().replace(',', '.').split(' ')
+		obj.price = price[1] + price[0]
+		obj.icon = $(this).find('.t10img > a > img').attr('src')
 		arr.push(obj)
 	})
 	return arr
