@@ -1,7 +1,11 @@
 const cheerio = require('cheerio')
 const axios = require('axios')
 
-const baseurl = 'https://geizhals.de/'
+const baseurl = 'https://geizhals.de'
+
+function price(price) {
+	return price..trim().replace(',', '.').split(' ')
+}
 
 async function getCPUs(params) {
 	var urlext
