@@ -1,0 +1,17 @@
+{
+    "type": {
+        "identifier": "cat",
+        "amd": "cpuamdam4",
+        "intel": "cpu1151",
+        "hpc-processors": "cpucoproz"
+    },
+    "segments": {
+        "identifier": "xf",
+        "HEDT": "12099_Desktop+(HEDT)",
+        "mainstream": "12099_Desktop+(Mainstream)",
+        "server": "12099_Server",
+        "workstation": "12099_Workstation",
+        "embedded": "12099_Embedded",
+        "mobile": "12099_Mobile"
+    }
+}
