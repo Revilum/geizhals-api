@@ -4,7 +4,8 @@ const axios = require('axios')
 const baseurl = 'https://geizhals.de'
 
 function price(price) {
-	return price..trim().replace(',', '.').split(' ')
+	var str =  price.trim().replace(',', '.').split(' ')
+	return str[1] + str[0]
 }
 
 async function getCPUs(params) {
@@ -65,8 +66,7 @@ async function getCPUs(params) {
 		obj.link = baseurl + $(this).find('.productlist__item > .productlist__link').attr('href')
 		obj.image = $(this).find('picture > img').attr('big-image-url')
 		
-		var price = $(this).find('.productlist__price > .gh_price > .notrans').text().trim().replace(',', '.').split(' ')
-		obj.price = price[1] + price[0]
+		 obj.price = price($(this).find('.productlist__price > .gh_price > .notrans').text())
 		
 		obj.offers = parseInt($(this).find('.productlist__offerscount--standard').text().trim())
 		if (Number.isNaN(obj.offers)) {

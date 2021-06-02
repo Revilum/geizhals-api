@@ -19,7 +19,7 @@ async function getItem(url) {
 	var specs = new Object()
 	var imgs = []
 	var sellers = []
-	var payment = []
+	
 	
 	obj.name = $('.variant__header__headline').text().trim()
 	
@@ -35,6 +35,7 @@ async function getItem(url) {
 	$('.offer').each(function() {
 		var seller = new Object()
 		var rating = new Object()
+		var payment = []
 		
 		seller.name = $(this).find('.offer__merchant > .gh_offerlist__offerurl > .merchant__logo-caption').text().trim()
 		seller.price = price($(this).find('.gh_price').text())
@@ -42,7 +43,7 @@ async function getItem(url) {
 		seller.link = baseurl + $(this).find('.offer_bt').attr('href')
 		seller.availability =  $(this).find('.offer__delivery').text().trim()
 		
-		$(this).children('.offer__price').children('.offer__payment-options').children('.offer__payment-icon').each(function() {
+		$(this).find('.offer__payment-icon').each(function() {
 			payment.push($(this).attr('title'))
 		})
 		
@@ -69,4 +70,4 @@ async function getItem(url) {
 	return obj
 }
 
-getItem('https://geizhals.de/intel-core-i5-11400f-bx8070811400f-a2492594.html').then(res=> (console.log(res.sellers[0])))
+getItem('https://geizhals.de/intel-core-i5-11400f-bx8070811400f-a2492594.html').then(res=> (console.log(res.sellers[0].payment)))
