@@ -1,0 +1,47 @@
+{
+    "identifier": {
+        "filter": "xf",
+        "category": "cat",
+        "country": "hloc",
+        "minPrice": "bpmin",
+        "maxPrice": "bqmax",
+        "priceIncludeShipping": "t",
+        "availability": "v",
+        "search": "asuch",
+        "includeDescription": "asd",
+        "localOffers": "plz",
+        "radius": "dist" 
+    },
+    "requiredValues": {
+        "country": {
+            "param": "togglecountry",
+            "val": "set"
+        }
+    },
+    "values": {
+        "country": {
+            "ger": "de",
+            "pl": "pl",
+            "uk": "uk",
+            "at": "at"
+        },
+        "availability": {
+            "inStock": "l",
+            "shortTerm": "k"
+        },
+        "category": {
+            "identifier": "cat",
+            "amd": "cpuamdam4",
+            "intel": "cpu1151",
+            "hpc-processors": "cpucoproz"
+        },
+        "priceIncludeShipping": {
+            "true": "v",
+            "false": ""
+        },
+        "includeDescription": {
+            "true": "on",
+            "false": ""
+        }
+    }
+}

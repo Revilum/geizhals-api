@@ -14,11 +14,10 @@ async function start(url) {
 
     $('.xf_tr').each(function() {
         var filter = new Object()
-
+        
         $(this).find('.xf_i').each(function() {
             filter[$(this).find('.xf_v').text().trim().replace(/ /g, '-').toLowerCase()] = (new URL(baseurl + $(this).attr('href'))).searchParams.get('xf').replace(/ /g, '+')
         })
-
         obj[$(this).find('.xf_th').text().trim().replace(':', '').replace(/ /g, '-').toLowerCase()] = filter
     })
     return obj
