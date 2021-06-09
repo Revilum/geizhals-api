@@ -5,7 +5,7 @@
         "country": "hloc",
         "minPrice": "bpmin",
         "maxPrice": "bqmax",
-        "priceIncludeShipping": "t",
+        "shipping": "t",
         "availability": "v",
         "search": "asuch",
         "includeDescription": "asd",
@@ -35,9 +35,9 @@
             "intel": "cpu1151",
             "hpc-processors": "cpucoproz"
         },
-        "priceIncludeShipping": {
-            "true": "v",
-            "false": ""
+        "shipping": {
+            "priceIncludeShipping": "v",
+            "pickup": "a"
         },
         "includeDescription": {
             "true": "on",
