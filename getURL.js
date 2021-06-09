@@ -10,11 +10,7 @@ function getURL(obj, filters) {
         var param = config.identifier[attr]
         var val
         // if value in global.json is undefined then use the provided one
-        if (config.values[attr] == undefined) {
-            val = obj.values[attr]
-        } else {
-            val = config.values[attr][obj.values[attr]]
-        }
+        val = config.values[attr] == undefined ? obj.values[attr] : config.values[attr][obj.values[attr]]        
         // add param and value to URL
         url.searchParams.append(param, val)
         // if requiredValue exists for this filter add it to the URL
