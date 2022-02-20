@@ -1,7 +1,6 @@
 {
     "identifier": {
         "filter": "xf",
-        "category": "cat",
         "country": "hloc",
         "minPrice": "bpmin",
         "maxPrice": "bqmax",
@@ -17,6 +16,11 @@
             "param": "togglecountry",
             "val": "set"
         }
+    },
+    "mainFilters": {
+			"category": "m",
+			"subCategory": "o",
+			"finalCategory": "cat"
     },
     "values": {
         "country": {

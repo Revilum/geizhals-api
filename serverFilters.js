@@ -1,14 +1,14 @@
 const cheerio = require('cheerio')
-const puppeteer = require('puppeteer')
+const axios = require('axios')
+const fs = require('fs')
 
 const baseurl = 'https://geizhals.de'
 
-async function start(url) {
-    const browser = await puppeteer.launch()
-	const page = await browser.newPage();
-	await page.goto(url)
-	const $ = cheerio.load(await page.content())
-	browser.close()
+var globalConfig = JSON.parse(fs.readFileSync('./config/global.json', err => {throw err}))
+
+async function getConfig(url) {
+	var site = await axios.get(url)
+	const $ = cheerio.load(site.data)
 
     var obj = new Object()
 
@@ -23,4 +23,4 @@ async function start(url) {
     return obj
 }
 
-start('https://skinflint.co.uk/?cat=cpuamdam4').then(res => console.log(res))
+getConfig("https://geizhals.de/?cat=umtsover").then (res => console.log(res))
