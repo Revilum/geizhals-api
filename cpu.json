@@ -1,22 +1,22 @@
 [
   {
-    name: 'Intel Core i5-11400F, 6C/12T, 2.60-4.40GHz, boxed (BX8070811400F)',
-    link: 'https://geizhals.de/intel-core-i5-11400f-bx8070811400f-a2492594.html?hloc=at&hloc=de',
-    image: 'https://gzhls.at/i/25/94/2492594-n0.jpg',
-    price: '175.36€',
-    offers: 32,
-    bestPriceOffer: { seller: 'Caseking.de', country: 'DE' },
-    properties: {
-      Sockel: '1200 (LGA)',
-      Codename: 'Rocket Lake-S',
-      Grafik: 'nein',
-      TDP: '65W',
-      Kerne: '6',
-      Threads: '12',
-      Basistakt: '2.60GHz',
-      Turbotakt: '4.40GHz',
-      SMT: 'ja (Intel Hyper-Threading)',
-      Speichercontroller: 'Dual Channel PC4-25600U (DDR4-3200)'
+    "name": "Intel Core i5-11400F, 6C/12T, 2.60-4.40GHz, boxed (BX8070811400F)",
+    "link": "https://geizhals.de/intel-core-i5-11400f-bx8070811400f-a2492594.html?hloc=at&hloc=de",
+    "image": 'https://gzhls.at/i/25/94/2492594-n0.jpg',
+    "price": '175.36€',
+    "offers": 32,
+    "bestPriceOffer": { seller: 'Caseking.de', country: 'DE' },
+    "properties": {
+      "Sockel": "1200 (LGA)",
+      "Codename": "Rocket Lake-S",
+      "Grafik": "nein",
+      "TDP": "65W",
+      "Kerne": "6",
+      "Threads": "12",
+      "Basistakt": "2.60GHz",
+      "Turbotakt": "4.40GHz",
+      "SMT": "ja (Intel Hyper-Threading)",
+      "Speichercontroller": 'Dual Channel PC4-25600U (DDR4-3200)'
     },
     rating: {
       stars: 5,

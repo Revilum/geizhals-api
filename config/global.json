@@ -47,5 +47,6 @@
             "true": "on",
             "false": ""
         }
-    }
+    },
+    "baseurl": "https://geizhals.de/"
 }
