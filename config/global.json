@@ -17,8 +17,8 @@
             "val": "set"
         }
     },
-    "mainFilters": {
-			"category": "m",
+    "categories": {
+			"mainCategory": "m",
 			"subCategory": "o",
 			"finalCategory": "cat"
     },

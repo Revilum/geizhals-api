@@ -2,7 +2,7 @@ const fs = require("fs")
 const axios = require('axios')
 const puppeteer = require('puppeteer')
 
-const config = JSON.parse(fs.readFileSync('./config/global.json', 'utf-8'))
+const config = JSON.parse(fs.readFileSync(__dirname + '/config/global.json', 'utf-8'))
 
 function getParam(params, param) {
     return (new URL(config.baseurl + params).searchParams.get(param))

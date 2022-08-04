@@ -2,7 +2,7 @@ const fs = require('fs')
 
 function getURL(obj, filters) {
     const config = JSON.parse(fs.readFileSync(__dirname + '/config/global.json', 'utf8'))
-    const filtersobj = JSON.parse(fs.readFileSync(__dirname + '/config/cpu.json', 'utf8'))
+    const filtersobj = JSON.parse(fs.readFileSync(__dirname + '/config/cpu2.json', 'utf8'))
     var url = new URL(obj.url)
     // iterate through every param in obj.values
     for (attr in obj.values) {

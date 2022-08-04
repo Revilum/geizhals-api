@@ -1,6 +1,7 @@
 const cheerio = require('cheerio')
 const axios = require('axios')
 const puppeteer = require('puppeteer')
+const fs = require("fs");
 
 const baseurl = 'https://geizhals.de'
 
@@ -70,4 +71,6 @@ async function getItem(url) {
 	return obj
 }
 
-getItem('https://geizhals.de/intel-core-i5-11400f-bx8070811400f-a2492594.html').then(res=> (console.log(res.sellers[0].payment)))
+getItem('https://geizhals.de/intel-core-i5-11400f-bx8070811400f-a2492594.html').then(res=> {
+	fs.writeFile('item.json', JSON.stringify(res, null, 4), (err) => {console.log(err)})
+})
