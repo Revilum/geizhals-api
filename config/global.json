@@ -18,9 +18,9 @@
         }
     },
     "categories": {
-			"mainCategory": "m",
-			"subCategory": "o",
-			"finalCategory": "cat"
+			"subCat": "m",
+			"final": "o",
+            "page": "cat"
     },
     "values": {
         "country": {

@@ -17,4 +17,4 @@ async function getFilters(url) {
 
 module.exports = {getFilters}
 
-getFilters('https://geizhals.de/?cat=cpuamdam4').then(res => console.log(res))
+// getFilters('https://geizhals.de/?cat=cpuamdam4')

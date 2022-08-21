@@ -20,7 +20,17 @@ async function getFullSite(url) {
 }
 
 function parseText(string) {
-    return string.toLowerCase().trim().replaceAll(' ', '-')
+    return string.toLowerCase().trim().replaceAll(' ', '-').replaceAll('/', '')
 }
 
-module.exports = {getSite, getFullSite, getParam, parseText}
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+function getDirectories(path) {
+    return fs.readdirSync(path, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name)
+}
+
+module.exports = {getSite, getFullSite, getParam, parseText, sleep, getDirectories}

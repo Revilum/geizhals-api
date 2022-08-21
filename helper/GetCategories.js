@@ -1,8 +1,9 @@
 const fs = require("fs")
 const cheerio = require('cheerio')
-const {getParam, getSite, parseText} = require("../utils");
+const {getParam, getSite, parseText} = require("../utils")
 
-const config = JSON.parse(fs.readFileSync('../config/global.json', 'utf-8'))
+const config = JSON.parse(fs.readFileSync('./config/global.json', 'utf-8'))
+const keys = config.categories
 
 async function getCategories() {
     const source = await getSite(config.baseurl)
@@ -11,7 +12,7 @@ async function getCategories() {
     $('.mkat > a').each((index, elem) => {
         if (getParam($(elem).attr('href'), 'services') == null) { // filter out the weird power savings
             let sub = categories[parseText($(elem).attr('title'))] = {} // save category
-            sub.param = getParam($(elem).attr('href'), 'm') // save url
+            sub.param = getParam($(elem).attr('href'), keys.subCat) // save url
             sub.img = (new URL('https:' + $(elem).find('picture > source').attr('srcset').split(' ')[2])).toString()
             // go into the weird source and split out the correct link
         }
@@ -21,4 +22,6 @@ async function getCategories() {
 
 }
 
-// getCategories()
+// getCategories().then(res => console.log(res))
+
+module.exports = {getCategories}
