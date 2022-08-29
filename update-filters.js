@@ -46,8 +46,8 @@ async function main() {
             for (const finalCategory in finalCategories) {
                 const productListURL = new URL(config.baseurl)
                 productListURL.searchParams.append(keys.page, finalCategories[finalCategory].param)
-                console.log(finalCategories[finalCategory].param)
-                const finalListing = getFilters(productListURL.href)
+                const finalListing = await getFilters(productListURL.href)
+                console.log(finalListing)
                 console.log(productListURL.href)
                 if (fs.existsSync('./tmp/' + category + '/' + subCategory + '/' + finalCategory + '.json')) {
                     existingFilters = existingFilters.filter(item => item !== finalCategory)

@@ -11,7 +11,7 @@ async function getFinalCategories(url) {
     let finalCategories = {}
     $('.mocat-item').each((index, elem) => {
         let sub = finalCategories[parseText($(elem).find('.mocat-item__link').text())] = {}
-        sub.param = getParam($(elem).find('.mocat-item__link').attr('href'), keys.final)
+        sub.param = getParam($(elem).find('.mocat-item__link').attr('href'), keys.page)
         sub.img = (new URL($(elem).find('.mocat-item__body > .mocat-item__image > picture > source').attr('srcset').split(' ')[2])).toString()
     })
     // fs.writeFile('finalCategories.json', JSON.stringify(finalCategories, null, 4), (err) => {console.log(err)})
@@ -20,4 +20,4 @@ async function getFinalCategories(url) {
 
 module.exports = {getFinalCategories}
 
-// getFinalCategories('https://geizhals.de/?o=4')
+// getFinalCategories('https://geizhals.de/?o=4').then(res => console.log(res))
