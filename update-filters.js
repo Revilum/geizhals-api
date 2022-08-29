@@ -14,8 +14,8 @@ if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp')
 // setInterval(async function() {
 async function main() {
     const categories = await getCategories()
+    await sleep()
     fs.writeFile("./tmp/categories.json", JSON.stringify(categories, null, 4), err => {if (err) throw err})
-    await sleep(1000)
     let categoryDirectories = getDirectories('./tmp') // check all folders
     for (const category in categories) {
         if (!fs.existsSync('./tmp/' + category)) { // create folder for category if it doesn't exist
@@ -26,10 +26,10 @@ async function main() {
         const subCategoryURL = new URL(config.baseurl)
         subCategoryURL.searchParams.append(keys.subCat, categories[category].param)
         const subCategories = await getSubCategories(subCategoryURL.href)
+        await sleep()
         console.log(subCategoryURL.href)
         fs.writeFile('./tmp/' + category + '/' + category + '.json', JSON.stringify(subCategories, null, 4), err => {if (err) throw err})
         let subcategoryDirectories = []
-        await sleep(5000)
         for (const subCategory in subCategories) {
             if (!fs.existsSync('./tmp/' + category + '/' + subCategory)) { // create folder for subcategory if it doesn't exist
                 fs.mkdirSync('./tmp/' + category + '/' + subCategory)
@@ -39,23 +39,26 @@ async function main() {
             const finalCategoryURL = new URL(config.baseurl)
             finalCategoryURL.searchParams.append(keys.final, subCategories[subCategory].param)
             const finalCategories = await getFinalCategories(finalCategoryURL.href)
+            await sleep()
             console.log(finalCategoryURL.href)
             let existingFilters = []
-            fs.readdir('./tmp/' + category + '/' + subCategory + '/', file => existingFilters.push(file))
-            await sleep(5000)
+            fs.readdirSync('./tmp/' + category + '/' + subCategory + '/', (err, files) => {
+                if(err) throw err
+                files.forEach(file => existingFilters.push(file))
+            })
             for (const finalCategory in finalCategories) {
+                console.log(existingFilters)
                 const productListURL = new URL(config.baseurl)
                 productListURL.searchParams.append(keys.page, finalCategories[finalCategory].param)
                 const finalListing = await getFilters(productListURL.href)
-                console.log(finalListing)
                 console.log(productListURL.href)
                 if (fs.existsSync('./tmp/' + category + '/' + subCategory + '/' + finalCategory + '.json')) {
                     existingFilters = existingFilters.filter(item => item !== finalCategory)
                 }
                 fs.writeFile('./tmp/' + category + '/' + subCategory + '/' + finalCategory + '.json', JSON.stringify(finalListing, null, 4), err => {if (err) throw err})
-                await sleep(5000)
+                await sleep()
             }
-            existingFilters.forEach(file => fs.unlink('./tmp/' + category + '/' + subCategory + '/' + file + '.json'))
+            existingFilters.forEach(file => fs.unlink('./tmp/' + category + '/' + subCategory + '/' + file + '.json', err => {if (err) throw err}))
         }
         for (const dir in subcategoryDirectories) {
             fs.rmSync('./tmp/' + subCategory + '/' + dir, {recursive: true, force: true})  // delete all old filters

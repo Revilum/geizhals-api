@@ -23,8 +23,10 @@ function parseText(string) {
     return string.toLowerCase().trim().replaceAll(' ', '-').replaceAll('/', '')
 }
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
+function sleep() {
+    const maxMsSec = 30
+    const minMsSec = 10
+    return new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * (maxMsSec - minMsSec) + minMsSec)))
 }
 
 function getDirectories(path) {
