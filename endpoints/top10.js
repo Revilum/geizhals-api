@@ -1,22 +1,23 @@
 const cheerio = require('cheerio')
-const axios = require('axios')
+const { getSite, parseText, parseUrl, getParam, parsePrice} = require('../utils')
+const fs = require('fs')
+const config = JSON.parse(fs.readFileSync('../config/global.json', 'utf-8'))
 
-const baseurl = 'https://geizhals.de/'
-
-async function getTop10() {
-	var arr = []
-	var page = await axios.get(baseurl)
-	const $ = cheerio.load(page.data)
-	$('.t10 > li').each(function() {
-		var obj = new Object()
-		obj.name = $(this).find('.line-clamp > a').text().trim()
-		obj.link = baseurl + $(this).find('.line-clamp > a').attr('href')
-		var price = $(this).find('.gh_price').text().replace(',', '.').split(' ')
-		obj.price = price[1] + price[0]
-		obj.icon = $(this).find('.t10img > a > img').attr('src')
-		arr.push(obj)
-	})
-	return arr
+async function getTop10(url) {
+	const $ = cheerio.load(await getSite(url))
+	return $('.box10').first().find('.t10 > .t10i').toArray()
+		.map(elem => {
+			const name = parseText($(elem).find('.t10a > .flex > .line-clamp > a').text())
+			const img = parseUrl($(elem).find('.t10img > a > img').attr('src'))
+			const price = parsePrice($(elem).find('.t10p > strong > .gh_price').text())
+			let change = $(elem).find('.t10ic')
+			if (change.hasClass('t10ic--up')) change =  1
+			else if (change.hasClass('t10ic--down')) change = -1
+			else change = 0
+			const category = getParam(parseUrl($(elem).find('.link-secondary').attr('href')), config.categories.page)
+			return {name, img, price, change, category}
+		})
 }
-getTop10().then(res=> (console.log(res)))
-//getTop10()
+
+module.exports = {getTop10}
+// getTop10('https://geizhals.de/?m=1').then(res=> (console.log(res)))

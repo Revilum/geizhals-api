@@ -51,17 +51,17 @@ async function main() {
                 const productListURL = new URL(config.baseurl)
                 productListURL.searchParams.append(keys.page, finalCategories[finalCategory].param)
                 const finalListing = await getFilters(productListURL.href)
+                await sleep()
                 console.log(productListURL.href)
                 if (fs.existsSync('./tmp/' + category + '/' + subCategory + '/' + finalCategory + '.json')) {
                     existingFilters = existingFilters.filter(item => item !== finalCategory)
                 }
                 fs.writeFile('./tmp/' + category + '/' + subCategory + '/' + finalCategory + '.json', JSON.stringify(finalListing, null, 4), err => {if (err) throw err})
-                await sleep()
             }
             existingFilters.forEach(file => fs.unlink('./tmp/' + category + '/' + subCategory + '/' + file + '.json', err => {if (err) throw err}))
         }
         for (const dir in subcategoryDirectories) {
-            fs.rmSync('./tmp/' + subCategory + '/' + dir, {recursive: true, force: true})  // delete all old filters
+            fs.rmSync('./tmp/' + category + '/' + dir, {recursive: true, force: true})  // delete all old filters
         }
     }
     for (const dir in categoryDirectories) {
