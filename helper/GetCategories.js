@@ -1,27 +1,29 @@
-const fs = require("fs")
-const cheerio = require('cheerio')
-const {getParam, getSite, parseText} = require("../utils")
+'use strict';
 
-const config = JSON.parse(fs.readFileSync('./config/global.json', 'utf-8'))
-const keys = config.categories
+const cheerio = require('cheerio');
+const {getParam, getSite, parseText, parseUrl} = require('../utils');
+const config = require('../config/global.json');
 
-async function getCategories() {
-    const source = await getSite(config.baseurl)
-    const $ = cheerio.load(source)
-    let categories = {}
-    $('.mkat > a').each((index, elem) => {
-        if (getParam($(elem).attr('href'), 'services') == null) { // filter out the weird power savings
-            let sub = categories[parseText($(elem).attr('title'))] = {} // save category
-            sub.param = getParam($(elem).attr('href'), keys.subCat) // save url
-            sub.img = (new URL('https:' + $(elem).find('picture > source').attr('srcset').split(' ')[2])).toString()
-            // go into the weird source and split out the correct link
-        }
-    })
-    // fs.writeFile('../cache/mainCategories.json', JSON.stringify(categories, null, 4), () => {})
-    return categories
-
+function firstImage($, node, baseURL) {
+  const srcset = $(node).find('picture source').first().attr('srcset');
+  const src = srcset?.split(',')[0]?.trim()?.split(/\s+/)[0] || $(node).find('img').first().attr('src');
+  return parseUrl(src, baseURL);
 }
-
-// getCategories().then(res => console.log(res))
-
-module.exports = {getCategories}
+function parseCategories(html, baseURL) {
+  const $ = cheerio.load(String(html ?? ''));
+  const result = {};
+  $('.mkat > a, a.nav-m-link[href*="m="]').each((_, el) => {
+    const anchor = $(el);
+    const href=anchor.attr('href');
+    if (getParam(href,'services')) return;
+    const title = parseText(anchor.attr('title') || anchor.text());
+    const param = getParam(href, config.categories.subCat);
+    if(title && param) result[title] = {param,img:firstImage($,el,baseURL)};
+  });
+  return result;
+}
+async function getCategories(options = {}) {
+  const source=options.html??await getSite(config.baseurl,options);
+  return parseCategories(source,config.baseurl);
+}
+module.exports={getCategories,parseCategories};

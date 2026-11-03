@@ -1,0 +1,41 @@
+name: Node.js checks
+
+on:
+  push:
+    branches: [main, 'fix/**', 'codex/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [22, 24, 26]
+        include:
+          - os: windows-latest
+            node-version: 24
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci --ignore-scripts --no-fund
+      - run: npm run demo
+      - run: npm run check
+      - run: npm test
+      - run: npm run packcheck
+      - name: Audit production dependencies
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 24
+        run: npm audit --omit=dev --audit-level=high
