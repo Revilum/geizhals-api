@@ -1,23 +1,25 @@
-const {getSite, parseText, getParam} = require("../utils")
-const cheerio = require("cheerio")
-const fs = require("fs")
+'use strict';
 
-const config = JSON.parse(fs.readFileSync('./config/global.json', 'utf-8'))
-const keys = config.categories
+const cheerio=require('cheerio');
+const {getParam,getSite,parseText,parseUrl}=require('../utils');
+const config=require('../config/global.json');
 
-async function getFinalCategories(url) {
-    const source = await getSite(url)
-    const $ = cheerio.load(source)
-    let finalCategories = {}
-    $('.mocat-item').each((index, elem) => {
-        let sub = finalCategories[parseText($(elem).find('.mocat-item__link').text())] = {}
-        sub.param = getParam($(elem).find('.mocat-item__link').attr('href'), keys.page)
-        sub.img = (new URL($(elem).find('.mocat-item__body > .mocat-item__image > picture > source').attr('srcset').split(' ')[2])).toString()
-    })
-    // fs.writeFile('finalCategories.json', JSON.stringify(finalCategories, null, 4), (err) => {console.log(err)})
-    return finalCategories
+function parseFinalCategories(html) {
+  const $=cheerio.load(String(html ?? ''));
+  const result={};
+  $('.mocat-item').each((_,el)=>{
+    const item=$(el);
+    const a=item.find('.mocat-item__link').first();
+    const name=parseText(a.text());
+    const param=getParam(a.attr('href'),config.categories.page);
+    const srcset=item.find('picture source').first().attr('srcset');
+    const src=srcset?.split(',')[0]?.trim().split(/\s+/)[0] || item.find('img').first().attr('src');
+    if(name && param) result[name]={param,img:parseUrl(src)};
+  });
+  return result;
 }
-
-module.exports = {getFinalCategories}
-
-// getFinalCategories('https://geizhals.de/?o=4').then(res => console.log(res))
+async function getFinalCategories(url,options={}) {
+  const source=options.html??await getSite(url,options);
+  return parseFinalCategories(source);
+}
+module.exports={getFinalCategories,parseFinalCategories};
