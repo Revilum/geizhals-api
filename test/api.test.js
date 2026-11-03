@@ -47,7 +47,7 @@ test('human-readable filters resolve through JSON catalog and raw xf values',()=
     const file=path.join(tmp,'category.json');
     fs.writeFileSync(file,JSON.stringify({manufacturer:{amd:'7781_AMD',intel:'7781_Intel'}}));
     const url=new URL(api.getURL({type:'search',query:'cpu',filters:{manufacturer:['AMD','Intel']},filterFile:file,minPrice:100,maxPrice:300}));
-    assert.deepEqual(url.searchParams.getAll('xf'),['7781_AMD','7781_Intel']);
+    assert.deepEqual(url.searchParams.getAll('xf'),['7781_AMD~7781_Intel']);
     assert.equal(url.searchParams.get('bpmin'),'100');
     assert.equal(url.searchParams.get('bqmax'),'300');
     assert.throws(()=>api.filterValues({manufacturer:'missing'},file),/Unknown filter/);
@@ -102,7 +102,7 @@ test('category, subcategory, final category, filters exported as pure parsers',(
 test('browser instances always close on navigation failures',async()=>{
   let closed=0;
   const launch=async()=>({
-    newPage:async()=>({goto:async()=>{throw new Error('navigation failed')},content:async()=>'<html></html>'}),
+    newPage:async()=>({setRequestInterception:async()=>{},on:()=>{},goto:async()=>{throw new Error('navigation failed')},content:async()=>'<html></html>'}),
     close:async()=>{closed++;}
   });
   await assert.rejects(api.getFullSite('https://geizhals.de/',{launch}),/navigation failed/);

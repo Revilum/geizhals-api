@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 const {getSite, getFullSite, parseUrl, parsePrice} = require('../utils');
 const {getURL} = require('../getURL');
 
-function parseSearch(html) {
+function parseSearch(html, baseURL) {
   const $ = cheerio.load(String(html ?? ''));
   return $('.listview__item').toArray().map(element => {
     const row = $(element);
@@ -17,8 +17,8 @@ function parseSearch(html) {
     const stars = Number.parseFloat(row.find('.stars-value').first().text().replace(',', '.'));
     return {
       name: link.text().trim(),
-      link: parseUrl(link.attr('href')),
-      icon: parseUrl(img.attr('src') || img.attr('data-src')),
+      link: parseUrl(link.attr('href'), baseURL),
+      icon: parseUrl(img.attr('src') || img.attr('data-src'), baseURL),
       price: parsePrice(row.find('.price, .gh_price').first().text()),
       offers: Number.isNaN(offerCount) ? 0 : offerCount,
       availability: availability.attr('aria-label') || availability.text().trim() || null,
@@ -30,9 +30,15 @@ function parseSearch(html) {
 }
 
 async function search(query, options = {}) {
-  const url = getURL({type:'search',query, ...options});
+  const url = getURL({...options, type:'search', query});
   const html = options.html ?? await (options.rendered ? getFullSite(url,options) : getSite(url,options));
-  return parseSearch(html);
+  return parseSearch(html, url);
 }
 
-module.exports = {search, parseSearch};
+async function getListing(options = {}) {
+  const url = getURL({...options, type: 'listing'});
+  const html = options.html ?? await (options.rendered ? getFullSite(url, options) : getSite(url, options));
+  return parseSearch(html, url);
+}
+
+module.exports = {search, getListing, parseSearch};

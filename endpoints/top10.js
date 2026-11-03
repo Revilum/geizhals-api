@@ -1,10 +1,10 @@
 'use strict';
 
 const cheerio = require('cheerio');
-const {getSite, parseUrl, parsePrice, getParam} = require('../utils');
+const {getSite, getFullSite, parseUrl, parsePrice, getParam} = require('../utils');
 const {getURL} = require('../getURL');
 
-function parseTop10(html) {
+function parseTop10(html, baseURL) {
   const $ = cheerio.load(String(html ?? ''));
   let rows = $('.box10').first().find('.t10 > .t10i').toArray();
   // Current Geizhals homepage (2026) uses startpage__top10/galleryview instead.
@@ -19,21 +19,21 @@ function parseTop10(html) {
     return {
       name: anchor.text().trim(),
       img: parseUrl(item.find(current ? '.galleryview__image' : '.t10img img').first().attr('src')
-        || item.find(current ? '.galleryview__image' : '.t10img img').first().attr('data-src')),
+        || item.find(current ? '.galleryview__image' : '.t10img img').first().attr('data-src'), baseURL),
       price: parsePrice(item.find(current ? '.galleryview__price .gh_price' : '.t10p .gh_price').first().text()),
       change: /t10ic--up|gestiegen|icon-trending-up/.test(trendText) ? 1
         : /t10ic--down|gefallen|icon-trending-down/.test(trendText) ? -1 : 0,
       category: getParam(categoryLink,'cat'),
-      link: parseUrl(anchor.attr('href'))
+      link: parseUrl(anchor.attr('href'), baseURL)
     };
   }).filter(item=>item.name && item.link);
 }
 
 async function getTop10(options = {}) {
   if (typeof options === 'string') options={url:options};
-  const url=getURL({type:'top10',...options});
-  const html=options.html??await getSite(url,options);
-  return parseTop10(html);
+  const url=getURL({...options,type:'top10'});
+  const html=options.html??await (options.rendered ? getFullSite(url,options) : getSite(url,options));
+  return parseTop10(html, url);
 }
 
 module.exports={getTop10,parseTop10};

@@ -15,12 +15,12 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=20.18.1"
+    "node": ">=22.12.0"
   },
   "scripts": {
-    "test": "node --test test/*.test.js",
-    "check": "node --check index.js && node --check getURL.js && node --check utils.js && node --check endpoints/search.js && node --check endpoints/item.js && node --check endpoints/top10.js && node --check endpoints/reviews.js",
-    "packcheck": "npm pack --dry-run"
+    "test": "node --test",
+    "check": "node scripts/check.js",
+    "packcheck": "node scripts/packcheck.js"
   },
   "license": "GPL-3.0-only",
   "keywords": [

@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 const {getSite, getFullSite, parseUrl, parsePrice} = require('../utils');
 const {getURL} = require('../getURL');
 
-function parseItem(html) {
+function parseItem(html, baseURL) {
   const $ = cheerio.load(String(html ?? ''));
   const specs = {};
   const images = [];
@@ -20,7 +20,7 @@ function parseItem(html) {
     if(text.length>1) specs[text[0]]=text.slice(1).join(' ');
   });
   $('.slide_videodummy img, .variant__gallery img, .gallery .swiper-slide__image').each((_,el)=>{
-    const url=parseUrl($(el).attr('src') || $(el).attr('data-src'));
+    const url=parseUrl($(el).attr('src') || $(el).attr('data-src'), baseURL);
     if(url && !images.includes(url)) images.push(url);
   });
   $('.offer').each((_,el)=>{
@@ -36,13 +36,13 @@ function parseItem(html) {
       name:row.find('.merchant__logo-caption').first().text().trim(),
       price:parsePrice(row.find('.gh_price').first().text()),
       lastChecked:row.find('.offer__disclaimer time').first().text().trim() || null,
-      link:parseUrl(link),
+      link:parseUrl(link, baseURL),
       availability:row.find('.offer__delivery-time').first().text().trim() || row.find('.offer__delivery').first().text().trim() || null,
       payment:row.find('.offer__payment-icon').toArray().map(el=>$(el).attr('title')).filter(Boolean),
       rating:{
         stars:Number.isFinite(ratingStars)?ratingStars:0,
         ratings:Number.isNaN(ratingCount)?0:ratingCount,
-        link:parseUrl(ratingLink)
+        link:parseUrl(ratingLink, baseURL)
       }
     });
   });
@@ -52,7 +52,7 @@ function parseItem(html) {
 async function getItem(url,options={}) {
   const resolved=getURL({type:'item',item:url});
   const html=options.html??await (options.rendered ? getFullSite(resolved,options):getSite(resolved,options));
-  return parseItem(html);
+  return parseItem(html, resolved);
 }
 
 module.exports={getItem,parseItem};
