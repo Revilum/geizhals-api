@@ -10,12 +10,18 @@ From a checkout containing these changes:
 
 ```sh
 npm ci --ignore-scripts
+npm run demo
 npm test
 npm run check
 npm run packcheck
 ```
 
-`packcheck` creates a real tarball, installs it into a temporary consumer **offline**, and verifies the public API. Run `npm ci` first so the dependencies are cached. Temporary artifacts are removed. To build a distributable yourself, run `npm pack`; then install that `.tgz` in a consumer project. Do not assume the same-name npm registry package contains this implementation.
+`packcheck` creates a real tarball, installs it into a temporary consumer **offline** using the dependency graph from `package-lock.json`, and verifies the public API. Run `npm ci` first so the locked dependency tarballs are cached; a previously populated registry metadata cache is not required. Temporary artifacts are removed. To build a distributable yourself, run `npm pack`; then install that `.tgz` in a consumer project. Do not assume the same-name npm registry package contains this implementation.
+
+`npm run demo` exercises the public API with clearly labeled synthetic HTML and
+builds a search URL. It makes no network requests and does not need Puppeteer.
+This is a Node.js library; it does not start a web server. Live examples below
+depend on access to Geizhals and can return HTTP 403.
 
 ## JavaScript API
 
@@ -56,8 +62,9 @@ const reviews = await gh.getReviews(productUrl);
 | `getFilters(url, options)` | Filter labels and `xf` values |
 | `getURL(options)` / `detectPageType(url)` | URL construction and classification |
 | `filterValues(filters, file)` / `resolveFilterFile(options)` | Filter catalog resolution |
+| `refreshFilters(options)` | Explicit, bounded filter-catalog maintenance |
 
-Pure parsers (`parseSearch`, `parseTop10`, `parseItem`, `parseReviews`, `parseCategories`, `parseSubCategories`, `parseFinalCategories`, `parseFilters`) require no network. `parseSearch`, `parseTop10` and `parseItem` optionally take a base URL as their second argument. Fetching endpoints preserve the selected `.de`, `.at` or `.eu` origin in relative product, image and offer links.
+Pure parsers (`parseSearch`, `parseTop10`, `parseItem`, `parseReviews`, `parseCategories`, `parseSubCategories`, `parseFinalCategories`, `parseFilters`) require no network. `parseSearch`, `parseTop10`, `parseItem`, `parseCategories`, `parseSubCategories` and `parseFinalCategories` optionally take a base URL as their second argument. Fetching endpoints preserve the selected `.de`, `.at` or `.eu` origin in relative product, image and offer links, including subcategory and final-category images. `getCategories()` continues to fetch the configured homepage; use `parseCategories(html, baseURL)` for cached HTML from another region.
 
 ## URLs and filters
 
@@ -74,7 +81,12 @@ const url = gh.getURL({
 });
 ```
 
-`getURL('CPU')` is shorthand for a search URL. Supported types are `search`, `listing`, `top10`, `item` and `reviews`. Explicit item URLs are validated. Unknown paths are not classified as the homepage. Prices must be finite and nonnegative; minimum cannot exceed maximum. Userinfo, nonstandard ports and non-Geizhals fetch origins are rejected. Query values are URL encoded; multiple filter tokens are combined into one `xf` value separated by `~`. A raw token may contain spaces, such as a GPU model name.
+`getURL('CPU')` is shorthand for a search URL. Supported types are `search`, `listing`, `top10`, `item` and `reviews`. `detectPageType` returns `top10` for a bare homepage (`/`, `/index.php` or `/index.html`); it does not return a separate `homepage` type. Explicit item URLs are validated. Unknown paths are not classified as the homepage. Prices must be finite and nonnegative; minimum cannot exceed maximum. Userinfo, nonstandard ports and non-Geizhals fetch origins are rejected. Query values are URL encoded; multiple filter tokens are combined into one `xf` value separated by `~`. A raw token may contain spaces, such as a GPU model name.
+
+Search, listing and top-10 builders require a homepage or index path in `url`.
+An explicit listing/top-10 operation removes inherited `fs`/`asuch` search
+parameters, so a copied search URL cannot silently change the requested operation.
+Category parameters inherited from `url` receive the same validation as explicit options.
 
 For named filters, a JSON catalog maps labels to raw values:
 
@@ -108,7 +120,9 @@ HTTP via Axios is the default; importing the library does not fetch pages, start
 npm install puppeteer
 ```
 
-Chromium always closes after success or failure. HTTP error statuses are rejected. Browser interception rejects off-site navigation and non-publisher HTTP resources; this is **not a replacement for network/process sandboxing**. Rendering waits for `domcontentloaded`, not every asynchronous widget. It does not bypass a 403, CAPTCHA, sign-in requirement or pagination. The HTML byte limit is not a memory limit on Chromium itself.
+Chromium always closes after success or failure. HTTP error statuses and non-HTML response media types are rejected in both fetching modes (plain text and absent media-type headers remain supported). Request interception is enabled before navigation; service workers are bypassed when the page supports that Puppeteer method. Each intercepted navigation or redirect must use HTTPS on `geizhals.de`, `geizhals.at` or `geizhals.eu` (with optional `www.`). HTTP subresources must use HTTPS on those domains, `gzhls.at` or their subdomains. Credentials and nonstandard ports are rejected; non-network `data:` and `blob:` resources are allowed. Off-policy requests are aborted, and the final page URL is checked before returning HTML.
+
+The policy applies to intercepted requests on the created page; it is **not a browser-wide egress firewall or a replacement for network/process sandboxing**. The publisher/CDN domains and their subdomains are trusted for resources. Rendering waits for `domcontentloaded`, not every asynchronous widget. It does not bypass a 403, CAPTCHA, sign-in requirement or pagination. The HTML byte limit is not a memory limit on Chromium itself. Deterministic browser-policy tests use mocked Puppeteer requests, not a real Chromium network test.
 
 ## Filter maintenance
 

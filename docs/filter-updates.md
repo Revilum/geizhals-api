@@ -56,6 +56,8 @@ The workflow serializes refreshes with a concurrency group and retains its autom
 
 ## Verification and limits
 
-The integrated API + updater tree passed **60 deterministic tests** on Windows, Node 24.14.1, including the original 7 updater tests and 15 additional updater-safety regressions. Cases cover HTTP 401/403/429 after a successfully parsed page, invalid budgets, corrupted on-disk JSON, non-destructive merging, rotation wraparound, leaf selection, CLI help and dry runs.
+The integration of maintenance head `f344279` with API commit `11c1f17` passed **85 deterministic tests** on Windows, Node 24.14.1, including the original 7 updater tests, 15 updater-safety regressions, and adapted maintenance-entry checks. Cases cover HTTP 401/403/429 after a successfully parsed page, invalid budgets, corrupted on-disk JSON, non-destructive merging, rotation wraparound, leaf selection, safe import, CLI help/invalid options and dry runs. The full syntax check passed for 25 JavaScript files; the offline demo also passed.
+
+Package verification uses the repository's locked dependency graph, installs a real tarball into a temporary consumer offline, checks the `refreshFilters` export and packaged maintenance files, and runs the installed `geizhals-update-filters --help` binary through npm. The isolated cache was initially empty and seeded only by `npm ci`. These checks make no live crawler requests. See [verification status](verification-status.md) for the remaining external gates.
 
 Live filter-page extraction still needs successful access and representative current fixtures; earlier live requests returned HTTP 403. This PR does not mark that limitation resolved by passing offline tests. Only legacy `.xf_tr` filter markup and the documented navigation patterns are supported. Unknown layouts must not be treated as a complete catalog.

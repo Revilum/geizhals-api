@@ -1,42 +1,34 @@
 # Verification status — 2026-11-03
 
-This file supplements the original pull-request descriptions, which may still describe the earlier proposals. It is **not** a claim that all release checks pass.
+This maintenance integration combines PR #3 head `f34427928036ab41ff71629cb37182fe11c69058` with PR #2 commit `11c1f17c7bd382bfca3b0a9e8510ffb788a32605`. Review and merge #2 before #3. If #2 is squash-merged or rebased, reconcile #3's remaining diff and test the resulting merge candidate again.
 
-## Published changes
+## Local integration checks
 
-- API audit: upstream PR #2, branch `fix/public-api-url-parsers-20261103`, functional audit commit `a66586089a0bf22b52ff03df3fb597a1ea84f10d` plus documentation-packaging commit `6c2282729d63134820f88c1a30abd50e0ee4a40b`.
-- Maintenance audit: upstream draft PR #3, branch `fix/filters-cron-20261103`, functional maintenance commit `5c5772480c4201dc52830c03ad789d115dcb567b`.
-- PR #3 includes the API changes through `6c22827` for integrated testing. Review/merge #2 first. If #2 is squash-merged or rebased, reconcile #3's history and recheck its remaining diff before merging.
-
-### Concurrent API follow-up observed during final verification
-
-PR #2 subsequently advanced to `4f00d8bbf478f2f9c094fb1e46e4511187df8e52`, titled `fix: complete review regressions and offline package checks`. This separate follow-up was preserved, not overwritten. It adds browser-policy regressions, regional category-image fixes, and a lockfile-based offline consumer installation check.
-
-That commit's audit document reports **54 tests and package checks passing on Linux**. Those are the follow-up author's recorded results, not an additional run performed in this Windows audit. PR #3 has not yet incorporated that later commit. Its packaging implementation must be reconciled with the lockfile-based fix, and the combined current tree must be tested again. Do not apply the earlier 38/60 counts automatically to these newer heads.
-
-## Checks actually executed in this audit
+Executed on Windows, Node 24.14.1 / npm 11.11.0:
 
 | Check | Observed result |
 | --- | --- |
-| API regression suite | 38 passed, 0 failed on Windows / Node 24.14.1 |
-| API-only full JavaScript syntax check | Passed, 16 files |
-| API-only tarball and offline consumer installation/import | Passed |
-| Production dependency audit | 0 vulnerabilities reported at the time checked |
-| Integrated API + maintenance unit suite | 60 passed, 0 failed before the final maintenance export/packaging edits |
-| Integrated full JavaScript syntax check | Passed, 19 files after maintenance export/packaging edits |
-| Git staged whitespace checks | Passed before publishing each functional commit |
-| Fresh bounded live filter dry run | HTTP 403; stopped without writing staged catalogs |
-| Final integrated package/CLI consumer smoke | **Unresolved:** timed out, including a rerun with a 60-second child-process limit |
-| Final post-packaging unit rerun | Did not execute: it followed the failed smoke check in an `&&` command chain |
-| GitHub-hosted CI matrix | **Blocked before execution:** GitHub annotation reports an account-level billing lock |
+| Locked install without lifecycle scripts | Passed; 50 packages installed using an initially empty isolated cache |
+| Combined API + maintenance suite | 85 passed, 0 failed |
+| Full JavaScript syntax check | Passed, 25 files |
+| Offline synthetic API demo | Passed; no network requests |
+| Real tarball and offline consumer | Passed; public API and `refreshFilters` exports, maintenance files, bin metadata/link, installed CLI help |
+| Production dependency audit | 0 vulnerabilities reported |
+| Independent combined code/security review | No actionable findings; 31 focused offline tests passed independently |
+| Git whitespace checks | Passed |
 
-The workstation subsequently timed out on basic read commands as well. This does not establish that the package is faulty or that it is correct: the final integrated consumer check needs another run on a responsive environment. Do not count the timeout as a passing check. The earlier green unit suite likewise does not replace verification of the final packaged entry points.
+The maintenance CLI remains the guarded, bounded implementation from PR #3. Its import does not initiate a refresh. Tests use fixtures, help, and invalid options; none executes the bare CLI or a live crawl. PR #2's disabled legacy-updater tests were adapted to these integrated semantics.
 
-## Remaining gates
+The consumer package check now reuses the locked dependency graph instead of resolving dependency ranges offline. It retains PR #2's browser-policy/category regressions and package fix together with PR #3's maintenance export, files, and binary checks. The manifest and lockfile root `bin` metadata are checked for agreement.
 
-1. Reconcile the concurrent API follow-up into the maintenance branch without losing its CLI checks. On a responsive test environment, run locked install, all tests, full syntax checks, and the real packaged consumer/CLI checks on the resulting current heads.
-2. Resolve the GitHub account issue and rerun Linux Node 22/24/26 and Windows Node 24 checks. No billing settings, runner registration or repository policy settings were changed by this work.
-3. Obtain permitted live-site access and current fixtures before claiming complete category top-10, asynchronous review/pagination, or filter extraction support. No bypass of HTTP 403 or other access restrictions is implemented.
-4. Review/merge the PRs in order; enable scheduled refresh only deliberately through `ENABLE_FILTER_REFRESH=true` and the required PR-creation permission. No npm package was published, no upstream PR was merged, and no production server was deployed.
+## External gates and limitations
 
-See `README.md`, `docs/audit.md`, and `docs/filter-updates.md` for the original TODO coverage, implementation details and safety limits.
+- The latest inspected PR #3 GitHub Actions run, `41690063008` at `f344279`, did not execute its jobs. Its check annotations explicitly report an account-level billing lock. This is an external prerequisite, not evidence of a failing test. A successful local run does not replace Linux Node 22/24/26 and Windows Node 24 CI results for the updated head.
+- Earlier permitted live filter requests returned HTTP 403. No new live crawler request was made for this integration. Current filter extraction remains unverified; only legacy `.xf_tr` filter markup and the documented navigation patterns have fixture coverage. Unknown or empty layouts cannot establish complete catalog coverage.
+- Browser-policy tests use mocked Puppeteer requests, not real Chromium network isolation. The documented publisher/CDN trust boundary remains.
+- Category-specific top-10 availability, asynchronous reviews and pagination remain limited by available markup and permitted access.
+- No npm package was published, no upstream PR was merged, and no schedule, account billing or repository policy setting was changed by this integration.
+
+Keep PR #3 draft until its live extraction limitation is resolved or explicitly accepted as a release limitation. The source fork's Actions variable list was checked during delivery: no repository variables were configured, so `ENABLE_FILTER_REFRESH` was unset. No refresh was dispatched. After review/merge, a maintainer must deliberately opt into scheduled refresh with `ENABLE_FILTER_REFRESH=true` and permit `GITHUB_TOKEN` PR creation. The command never merges automatically or pushes directly to the default branch.
+
+See `README.md`, `docs/audit.md`, `docs/filter-updates.md`, and `docs/ai-assistance.md` for API coverage, maintenance safeguards, historical audit evidence and attribution.

@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const config = require('./config/global.json');
 const {parseUrl, isGeizhalsURL, parseText} = require('./utils');
+const INDEX_PATHS = new Set(['/', '/index.php', '/index.html']);
 
 function detectPageType(value) {
   const href = parseUrl(value);
@@ -12,7 +13,7 @@ function detectPageType(value) {
   if (/(?:\/|-)a\d+\.html$/i.test(url.pathname)) return 'item';
   if (url.searchParams.has('fs') || url.searchParams.has('asuch')) return 'search';
   if (['cat', 'm', 'o'].some(key => url.searchParams.has(key))) return 'listing';
-  return ['/', '/index.php', '/index.html'].includes(url.pathname) ? 'top10' : 'unknown';
+  return INDEX_PATHS.has(url.pathname) ? 'top10' : 'unknown';
 }
 
 function record(value) {
@@ -111,6 +112,14 @@ function validPrice(value, name) {
   return amount;
 }
 
+function categoryValue(key, value) {
+  const text = String(value);
+  if (typeof value === 'boolean' || !(key === 'cat' ? /^[\w-]{1,90}$/ : /^[1-9]\d{0,9}$/).test(text)) {
+    throw new TypeError('Invalid category parameter: ' + key);
+  }
+  return text;
+}
+
 function getURL(options = {}) {
   if (typeof options === 'string') options = {type: 'search', query: options};
   if (!record(options)) throw new TypeError('options must be an object');
@@ -124,10 +133,17 @@ function getURL(options = {}) {
     return url.href;
   }
   if (!['top10', 'listing', 'search'].includes(type)) throw new RangeError('Unsupported page type: ' + type);
+  if (!INDEX_PATHS.has(url.pathname)) {
+    throw new TypeError('Search, listing and top10 require a homepage or index path');
+  }
   const params = url.searchParams;
   if (type === 'search') {
     if (typeof options.query !== 'string' || !options.query.trim()) throw new TypeError('A nonempty search query is required');
     params.set('fs', options.query.trim());
+    params.delete('asuch');
+  } else {
+    // A copied search URL must not turn an explicit listing/top10 operation into a search.
+    params.delete('fs');
     params.delete('asuch');
   }
   for (const [key, value] of [
@@ -135,12 +151,12 @@ function getURL(options = {}) {
     ['cat', options.cat ?? options.finalCategory]
   ]) {
     if (value != null) {
-      const text = String(value);
-      if (typeof value === 'boolean' || !(key === 'cat' ? /^[\w-]{1,90}$/ : /^[1-9]\d{0,9}$/).test(text)) {
-        throw new TypeError('Invalid category parameter: ' + key);
-      }
-      params.set(key, text);
+      params.set(key, categoryValue(key, value));
     }
+  }
+  // URL-derived parameters must satisfy the same contract as explicit options.
+  for (const key of ['m', 'o', 'cat']) {
+    for (const value of params.getAll(key)) categoryValue(key, value);
   }
   if (type === 'listing' && !['m', 'o', 'cat'].some(key => params.has(key))) {
     throw new TypeError('A listing requires m, o or cat');

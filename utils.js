@@ -59,6 +59,12 @@ function checkHtml(value, maxBytes) {
   return html;
 }
 
+function checkContentType(contentType) {
+  if (contentType && !/^text\/(html|plain)\b|^application\/xhtml\+xml\b/i.test(contentType)) {
+    throw new TypeError('Expected an HTML text response, not ' + contentType);
+  }
+}
+
 async function getSite(url, options = {}) {
   if (!isGeizhalsURL(url)) throw new TypeError('Only HTTPS Geizhals pages without credentials or nonstandard ports are supported');
   const {timeout, maxBytes} = requestLimits(options, 20000);
@@ -85,10 +91,7 @@ async function getSite(url, options = {}) {
   if (typeof response.status === 'number' && (response.status < 200 || response.status >= 300)) {
     throw new Error('Geizhals returned HTTP ' + response.status);
   }
-  const contentType = response.headers?.['content-type'];
-  if (contentType && !/^text\/(html|plain)\b|^application\/xhtml\+xml\b/i.test(contentType)) {
-    throw new TypeError('Expected an HTML text response, not ' + contentType);
-  }
+  checkContentType(response.headers?.['content-type']);
   return checkHtml(response.data, maxBytes);
 }
 
@@ -136,6 +139,7 @@ async function getFullSite(url, options = {}) {
     if (!response || response.status() < 200 || response.status() >= 300) {
       throw new Error('Geizhals returned HTTP ' + (response ? response.status() : 'no response'));
     }
+    checkContentType(response.headers?.()?.['content-type']);
     return checkHtml(await page.content(), maxBytes);
   } catch (error) {
     originalError = error;

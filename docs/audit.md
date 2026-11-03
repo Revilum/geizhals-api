@@ -1,5 +1,40 @@
 # Follow-up audit and verification — 2026-11-03
 
+## Local runnable-repair follow-up at PR #2 head `4f00d8b`
+
+Inspected the current PR discussion and source, then reproduced these additional defects:
+
+| Finding | Repair and evidence |
+| --- | --- |
+| Explicit listing/top-10 operations retained a copied URL's search query; non-item builders accepted product/unknown paths | Remove inherited `fs`/`asuch` for listing/top-10 and reject unsupported paths before HTTP. Regional homepage/index paths still work. |
+| Categories inherited from `url` bypassed validation | Apply the same category rules used for explicit options. URL regressions were red before repair; five tests now cover failures and valid regional paths. |
+| Rendered fetching accepted successful JSON/PDF/image responses | Apply the HTTP response media-type check before `page.content()`, retaining cleanup on failure. The new rejection test failed before repair; two browser-response tests now pass. |
+| Legacy updater performed filesystem/network work merely on import and used unsafe/incomplete update logic | Disable this obsolete entry point pending review/integration of separate draft PR #3. Two regressions first failed, then passed: import does no work; CLI exits clearly without touching the working directory. This is containment, not a completed replacement crawler. |
+| First example depended on live search access | Add `npm run demo`: public API calls on labeled synthetic HTML and URL construction, with no network or browser requirement. Include it in CI and allow checks on `codex/**` branches. |
+
+Fresh Windows verification on Node **24.14.1** / npm **11.11.0**:
+
+- `npm ci --ignore-scripts --no-fund`: passed, 50 packages installed.
+- `npm test`: **63 passed, 0 failed** (54 existing + 9 new).
+- `npm run demo`: passed; no network requests.
+- `npm run check`: **22 JavaScript files** passed syntax checking.
+- `npm run packcheck`: actual tarball, offline installation and exported API consumer smoke passed.
+- `npm audit --omit=dev --audit-level=high`: **0 vulnerabilities reported**.
+- `git diff --check`: passed.
+- Independent review found no actionable issues in the combined changes and independently passed all nine new tests plus the demo.
+
+Live HTTP smoke at **2026-11-03 17:58 UTC**: homepage yielded **10** Top-10 entries and **14** category groups; the first product yielded **36** specs, **26** images and **32** sellers. That product HTML had no visible review nodes. Search (`fs=Ryzen`) and listing (`cat=cpuamdam4`) returned **HTTP 403**. No retries, bypasses or browser installation were performed. Browser checks use mocks.
+
+The PR's outdated Puppeteer security finding was already addressed in this baseline. The existing interception tests passed; it is not claimed as a newly repaired defect.
+
+Remote CI is **not verified green**. Both the [API run](https://github.com/hxwxdmhd/geizhals-api/actions/runs/41688347191) and the [maintenance run from the notification](https://github.com/hxwxdmhd/geizhals-api/actions/runs/41689472760) failed before test steps ran. Check annotations report an account lock due to a billing issue. Account billing requires the operator's attention; source changes cannot resolve it.
+
+At the original local verification stage, no GitHub comments, pushes, PR updates, merges, npm publication, schedules or infrastructure changes were made. The operator subsequently approved publication of the reviewed repairs to the existing PR #2 branch and integration into draft PR #3. The existing maintenance PR remains separate. The earlier sections below record earlier verification stages rather than current remote success.
+
+### Approved PR #2 publication verification
+
+The repair patch was applied on top of the attributed PR head `3a05d8c` in an isolated worktree. Fresh Windows / Node 24.14.1 checks passed: all **63 tests**, **22 JavaScript syntax checks**, the offline demo, actual tarball/offline consumer installation and dependency audit (**0 vulnerabilities reported**). Independent review passed all nine new regressions and found no actionable code issues. Existing Codex attribution is preserved. Publication updates the source branch only; upstream merging, npm publication and crawler activation remain outside this change.
+
 Baseline: upstream main `63890bfa502ac982076b793dbe35578cecb3b1a4`, public API proposal `92fddb67973c5e38f5a9040e598a43ceaadd3399`.
 
 The existing API proposal passed 14 tests. The follow-up reproduced additional failures rather than assuming the green suite covered all inputs.
@@ -27,6 +62,51 @@ The existing API proposal passed 14 tests. The follow-up reproduced additional f
 - Full JavaScript syntax check passed (16 files at this API-only stage).
 - Actual tarball, offline consumer installation and exported API smoke test passed.
 - CI results must be inspected on the PR head; the matrix configuration is not itself a successful run.
+
+## PR #2 review follow-up
+
+Inspected PR head: `6c2282729d63134820f88c1a30abd50e0ee4a40b`. The Copilot thread at
+https://github.com/Revilum/geizhals-api/pull/2#discussion_r4456466528
+was already marked outdated. At this head, `getFullSite` already installs request
+interception before navigating, validates each intercepted navigation/resource
+URL and checks the final URL. This follow-up preserves that implementation and
+adds explicit regression coverage; it does not claim that the old missing-policy
+bug was still present.
+
+- Added 11 mocked browser-policy tests for setup ordering, regional origins,
+  private/loopback IPv4 and IPv6 targets, URL schemes, credentials, ports,
+  lookalike hosts, navigation/resource redirect destinations and cleanup.
+- Fixed relative category images retaining the wrong `.de` origin when their
+  source page was on `.at` or `.eu`. Five tests cover the optional parser base URL,
+  endpoint forwarding, image/srcset sources, default behavior and absolute CDN URLs.
+- Made the `top10` homepage classification explicit in the README. German grouped
+  prices and shared array/object filter validation were already fixed and tested.
+- Reproduced a separate `packcheck` failure after seeding a new npm cache only with
+  `npm ci`: an unlocked offline consumer install required uncached registry
+  metadata and failed with `ENOTCACHED`. The check now builds a temporary consumer
+  lockfile from the repository's dependency graph and installs the actual local
+  tarball with `npm ci --offline`, preserving integrity checks. It also verifies
+  that the referenced audit document is packaged.
+
+Executed for this follow-up on Linux, Node 24.22.1 / npm 11.9.0:
+
+- `npm test`: **54 passed, 0 failed** (38 existing + 11 browser + 5 category tests).
+- `npm run check`: **18 JavaScript files** passed syntax checking.
+- `npm run packcheck`: actual tarball, offline installation and API smoke test passed.
+- Isolated cache reproduction: original check failed; corrected check passed using
+  the same cache seeded by `npm ci`. An intentionally missing packaged helper was
+  rejected. Project/cache paths containing spaces were also exercised.
+- `npm audit --omit=dev --audit-level=high`: **0 vulnerabilities reported**.
+- `git diff --check`: passed.
+
+These browser tests use mocked Puppeteer requests, not a real Chromium network
+integration. The documented page-scoped policy and publisher/CDN trust boundary
+remain; comprehensive browser-wide egress isolation is not established by these tests.
+
+The inspected fork workflow run `41686516269` failed all four jobs with no
+recorded steps and no runner name. Its logs were unavailable. These observations
+do not establish the cause of the remote failure, and local checks are not a
+substitute for a successful remote CI run.
 
 ## Deliberately not claimed as complete
 
