@@ -1,0 +1,36 @@
+name: Refresh filter catalogs
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 6 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies without downloading a browser
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Test filter parser and file safeguards
+        run: node --test test/filter-update.test.js
+      - name: Fetch limited current filter snapshots
+        run: node update-filters.js --rotate --category-limit 1 --subcategory-limit 3 --max-pages 40 --delay-ms 4000 --output filters
+      - name: Create reviewable pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          add-paths: filters/**/*.json
+          branch: automation/geizhals-filter-refresh
+          delete-branch: true
+          commit-message: 'chore: refresh public filter catalog'
+          title: 'chore: update Geizhals filter catalog (automated)'
+          body: 'Bounded automated filter refresh. Review resulting JSON and data coverage before merging. No direct merge or deletion.'
