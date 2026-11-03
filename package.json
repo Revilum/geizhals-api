@@ -13,7 +13,9 @@
     "config/global.json",
     "README.md",
     "LICENSE",
-    "docs/**/*.md"
+    "docs/**/*.md",
+    "lib/**/*.js",
+    "update-filters.js"
   ],
   "engines": {
     "node": ">=22.12.0"
@@ -21,7 +23,8 @@
   "scripts": {
     "test": "node --test",
     "check": "node scripts/check.js",
-    "packcheck": "node scripts/packcheck.js"
+    "packcheck": "node scripts/packcheck.js",
+    "filters:update": "node update-filters.js"
   },
   "license": "GPL-3.0-only",
   "keywords": [
@@ -45,5 +48,8 @@
     "puppeteer": {
       "optional": true
     }
+  },
+  "bin": {
+    "geizhals-update-filters": "update-filters.js"
   }
 }

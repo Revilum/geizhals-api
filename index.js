@@ -10,11 +10,13 @@ const {getSubCategories,parseSubCategories} = require('./helper/getSubCategories
 const {getFinalCategories,parseFinalCategories} = require('./helper/getFinalCategories');
 const {getFilters,parseFilters} = require('./helper/getFilters');
 const utils = require('./utils');
+const {refreshFilters} = require('./lib/filter-updater');
 
 module.exports = {
   search, getListing, getItem, getTop10, getReviews, getURL, detectPageType, filterValues, resolveFilterFile,
   parseSearch, parseItem, parseTop10, parseReviews,
   getCategories, getSubCategories, getFinalCategories, getFilters,
   parseCategories, parseSubCategories, parseFinalCategories, parseFilters,
+  refreshFilters,
   ...utils
 };

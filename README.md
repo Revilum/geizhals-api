@@ -112,7 +112,16 @@ Chromium always closes after success or failure. HTTP error statuses are rejecte
 
 ## Filter maintenance
 
-The separate filter-maintenance PR provides `update-filters.js`, bounded requests, offline tests and a weekly/manual workflow that proposes **reviewable pull requests**. Do not run the legacy updater until that PR is merged. The maintenance workflow is not enabled by this API PR alone.
+The bounded maintenance client is exported as `refreshFilters(options)`, available as `node update-filters.js` / `npm run filters:update -- ...`, and included in the tarball as `geizhals-update-filters`.
+
+```sh
+npm run filters:update -- --help
+npm run filters:update -- --dry-run --rotate --category-limit 1 --subcategory-limit 1 --final-category-limit 1 --max-pages 4 --delay-ms 3000 --output filters
+```
+
+The updater stages results before writing, aborts the entire crawl on HTTP 401/403/429, preserves existing choices absent from a fetched page, and reports incomplete coverage explicitly. Each file is atomically replaced; this is not a multi-file filesystem transaction.
+
+The weekly workflow is **opt-in**: after review/merge, a maintainer may set the repository variable `ENABLE_FILTER_REFRESH=true` or invoke it manually. It uses locked dependencies and proposes a review PR; it never publishes npm packages, merges PRs or pushes directly to the default branch. Repository policy must permit `GITHUB_TOKEN` to create pull requests. No workflow/policy setting was enabled by this patch. See [filter maintenance](docs/filter-updates.md).
 
 ## Development checks
 
@@ -128,7 +137,7 @@ CI is configured for Linux on Node 22/24/26 and Windows on Node 24. Fork/externa
 | Original item | Coverage / remaining work |
 | --- | --- |
 | Top-10 for category/subcategory (`o`, `m`) | URL support and legacy/current section parsers implemented. **Partial:** category pages without a top-10 section cannot supply this data. No fabricated listing-as-top-10 fallback. |
-| Automate filter updates | Separate maintenance PR; live HTML access and permissions remain prerequisites. |
+| Automate filter updates | Implemented here with bounded requests and an opt-in workflow; live HTML access and permissions remain prerequisites. |
 | Finalize `getURL` with the correct filter file | Implemented: explicit catalog or unique auto-selection by leaf category. |
 | Distinguish item from listing | Implemented, with an exported listing client. |
 | Add filters to search | Implemented: raw/named filters, composition, encoding and price checks. |
@@ -136,7 +145,7 @@ CI is configured for Linux on Node 22/24/26 and Windows on Node 24. Fork/externa
 | Rework `getURL` | Implemented and regression tested. |
 | Make all functions accessible | Public library functions exported from `index.js`. |
 | Create npm package | Tarball and consumer smoke test implemented. **Not published.** |
-| Automated filter commits | Separate maintenance PR creates review PRs, not direct/default-branch pushes or merges. |
+| Automated filter commits | Implemented opt-in workflow creates review PRs, not direct/default-branch pushes or merges; not enabled remotely. |
 
 A previous live check returned HTTP 403 for search. Offline tests prove parser behavior against fixtures, not continued availability of the website. An empty parse result may indicate unsupported markup rather than genuinely absent products or reviews. See `docs/audit.md` for the follow-up regression findings.
 

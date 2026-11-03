@@ -6,31 +6,57 @@ on:
     - cron: '20 6 * * 1'
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+
+concurrency:
+  group: geizhals-filter-catalog-refresh
+  cancel-in-progress: false
 
 jobs:
   update:
+    # A maintainer must opt in before weekly live requests. Manual dispatch is explicit consent.
+    if: github.event_name == 'workflow_dispatch' || vars.ENABLE_FILTER_REFRESH == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - name: Install dependencies without downloading a browser
-        run: npm install --ignore-scripts --no-audit --no-fund
-      - name: Test filter parser and file safeguards
-        run: node --test test/filter-update.test.js
-      - name: Fetch limited current filter snapshots
-        run: node update-filters.js --rotate --category-limit 1 --subcategory-limit 3 --max-pages 40 --delay-ms 4000 --output filters
-      - name: Create reviewable pull request
+          node-version: '24'
+          cache: npm
+      - name: Install locked dependencies without downloading Chromium
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check source and all deterministic regression tests
+        run: |
+          npm run check
+          npm test
+      - name: Fetch a bounded, rotating sample of filter catalogs
+        run: >-
+          node update-filters.js --rotate --category-limit 1
+          --subcategory-limit 3 --final-category-limit 10
+          --max-pages 40 --delay-ms 4000 --output filters
+          > "$RUNNER_TEMP/geizhals-filter-report.json"
+      - name: Record actual coverage in the workflow summary
+        run: |
+          echo '## Filter refresh coverage' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/geizhals-filter-report.json" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Missing older choices are retained for manual review. Partial coverage is not a full inventory.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Propose catalog changes for human review
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           add-paths: filters/**/*.json
           branch: automation/geizhals-filter-refresh
-          delete-branch: true
+          delete-branch: false
           commit-message: 'chore: refresh public filter catalog'
           title: 'chore: update Geizhals filter catalog (automated)'
-          body: 'Bounded automated filter refresh. Review resulting JSON and data coverage before merging. No direct merge or deletion.'
+          body: |
+            Bounded, opt-in filter refresh. This is a partial snapshot, not a complete catalog inventory.
+            See the workflow summary for requests, discovered catalogs and partial-coverage reasons.
+            Existing choices absent from returned HTML are retained; stale choices require manual review.
+            HTTP 401/403/429 abort before staged catalogs are written. No automatic merge or default-branch push.

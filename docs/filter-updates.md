@@ -1,43 +1,61 @@
-# Filter catalog refresh workflow
+# Filter catalog maintenance
 
-The original `update-filters.js` had non-awaited writes, incorrect directory cleanup and no reliable automation. This implementation is a **bounded, non-destructive** crawler. It updates only JSON files containing nonempty parsed filters and never deletes existing filter files.
+This maintenance change is stacked on the public API PR: **review/merge #2 before #3**. Its Node 22.12+ runtime, locked dependency tree and test tools match the client package. It does not merge anything or enable repository policy settings itself.
 
-## Run locally
+## Usage
 
 ```sh
-npm install --ignore-scripts
-node --test test/filter-update.test.js
-node update-filters.js --dry-run --max-pages 12 --delay-ms 4000 --output filters
-node update-filters.js --max-pages 40 --delay-ms 4000 --output filters
+npm ci --ignore-scripts
+npm test
+npm run check
+npm run filters:update -- --help
+npm run filters:update -- --dry-run --rotate --category-limit 1 --subcategory-limit 1 --final-category-limit 1 --max-pages 4 --delay-ms 3000 --output filters
 ```
 
-To focus on a category, pass `--category-offset 0 --category-limit 1`. Optionally use `--subcategory-offset` and `--subcategory-limit`. `--rotate` selects a different category and subcategory over calendar weeks, allowing bounded updates instead of unbounded scraping. The updater stops at the request budget and explicitly marks partial runs.
+Omit `--dry-run` only after checking access, coverage and the intended destination. `--output` is relative to the process working directory unless it is absolute. For an installed tarball, the `geizhals-update-filters` binary and `require('geizhals-api').refreshFilters` expose the same implementation.
 
-Each successfully parsed filter JSON file contains a mapping such as:
+No Chromium, credentials or live requests are needed for unit tests. Live crawling is explicit. HTTP 401, 403 or 429 causes an immediate stop after that request; do not attempt to bypass the site's restriction.
 
-```json
-{"manufacturer": {"amd": "7781_AMD", "intel": "7781_Intel"}}
+## Safeguards
+
+- Validate request budget (1..300), live delay (1000..60000 ms), offsets, limits and timestamps before any fetch. NaN, infinity, fractions and unsafe integers are rejected.
+- Fetch only HTTPS on `geizhals.de`/`www.geizhals.de`, without embedded credentials or nonstandard ports. Maintenance fetches do not follow redirects.
+- Bound HTTP response bytes and timeouts.
+- Deduplicate navigation, skip services links and normalize filenames; rotate main categories, subcategories **and leaf categories**. Explicit offsets/limits are available at every level.
+- Stage parsed data in memory until crawling completes. On HTTP 401/403/429, no staged catalog is written, even if earlier pages parsed successfully.
+- Reject ambiguous normalized filter labels instead of silently choosing the wrong value.
+- Validate **all existing catalog JSON** before the first write. A corrupt catalog does not allow an earlier prepared catalog to be partially updated.
+- Preserve old groups and choices absent from returned HTML. This prevents truncated filter pages from erasing known data. It also deliberately retains possibly stale entries, which need manual review.
+- Write changed files using a unique temporary file and rename, cleaning temporary files on failure. Each file replacement is atomic; the full multi-file batch is **not** a transactional filesystem operation. Disk failure can leave earlier files committed and later files untouched.
+- Dry runs parse, merge and report changes without creating the output directory or modifying files.
+- Return `partial` and sorted `partialReasons` (budget, category/subcategory/leaf limits, empty pages/navigation, request errors), not merely a deceptively complete success flag.
+- Never delete a catalog or automatically merge a PR.
+
+A file currently has this layout:
+
+```text
+filters/<main-label>-m<id>/<sub-label>-o<id>/<leaf-label>-<cat>.json
 ```
 
-Files are stored under `filters/<main>-m<ID>/<subcategory>-o<ID>/<listing>-<cat>.json`. Use the generated file directly as `filterFile` for the URL builder in the API PR.
+The API's `filterDir` lookup can discover these generated files by explicit leaf `cat`. More than one matching catalog is an error; specify `filterFile` to disambiguate. Label changes can create a second path, so review duplicate/stale catalogs manually.
 
-## Automation
+## Weekly/manual GitHub workflow
 
-The `update-filters.yml` GitHub Actions workflow can be triggered manually and schedules a weekly bounded run. It runs the offline unit tests first, attempts a small catalog refresh, then creates a **pull request** containing only changed files under `filters/`. It does not push directly to `main` or auto-merge. The maintainer must enable GitHub Actions to create PRs and grant `contents: write` / `pull-requests: write` for this workflow.
+`.github/workflows/update-filters.yml` contains:
 
-## Fail-closed behavior
+1. A locked install on Node 24 and the full syntax/test suite.
+2. A budget of 40 requests, 4 seconds between requests, one main category, three subcategories, at most ten leaf pages per selected subcategory.
+3. A JSON coverage report in the workflow summary.
+4. A proposed PR on `automation/geizhals-filter-refresh`, restricted to `filters/**/*.json`; no direct default-branch update or automatic merge.
 
-- Any 403/429/blocked response or parser mismatch is recorded as an error.
-- If no nonempty filter section was parsed, the job **fails**; it does not replace valid catalogs with empty objects.
-- The updater does not delete stale entries automatically; they require review.
-- The HTTP client accepts only `https://geizhals.de` requests, uses finite timeouts, and does not follow redirects.
-- `--dry-run` reads but does not create or overwrite files.
-- A limited partial refresh is **not** a guarantee of full category coverage.
+### Required maintainer actions
 
-## Known limitation
+After review and merge, set repository variable **`ENABLE_FILTER_REFRESH=true`** to opt into the weekly Monday 06:20 UTC schedule, or explicitly run `workflow_dispatch`. Scheduled runs are skipped without opt-in. Fork workflows may also require enabling Actions. The repository must permit `GITHUB_TOKEN` to create pull requests, with the workflow job's `contents: write` and `pull-requests: write` permissions. No personal access token is required or requested by this patch.
 
-Live verification on 2026-11-03 showed that some Geizhals category/search pages returned HTTP 403. The scheduled workflow may therefore fail until the upstream site's access rules or structure permit parsing. Do not bypass access controls or claim complete coverage.
+The workflow serializes refreshes with a concurrency group and retains its automation branch. A denied or rate-limited request fails the fetch step; the PR-creation step does not run. Normal API tests never invoke the live crawler.
 
-## Tests
+## Verification and limits
 
-`node --test test/filter-update.test.js` validates navigation extraction, JSON output, no-op updates, dry runs, request budgets, host validation and preservation of existing data on errors. Fixtures are offline and make no requests to Geizhals.
+The integrated API + updater tree passed **60 deterministic tests** on Windows, Node 24.14.1, including the original 7 updater tests and 15 additional updater-safety regressions. Cases cover HTTP 401/403/429 after a successfully parsed page, invalid budgets, corrupted on-disk JSON, non-destructive merging, rotation wraparound, leaf selection, CLI help and dry runs.
+
+Live filter-page extraction still needs successful access and representative current fixtures; earlier live requests returned HTTP 403. This PR does not mark that limitation resolved by passing offline tests. Only legacy `.xf_tr` filter markup and the documented navigation patterns are supported. Unknown layouts must not be treated as a complete catalog.

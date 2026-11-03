@@ -30,13 +30,19 @@ try {
   }
   assert.ok(!included.has('endpoints/item.json'), 'Sample scraped output must not be packaged');
   assert.ok(![...included].some(file => /(^|\/)(node_modules|\.git|test|tmp)\//.test(file)), 'Development artifacts leaked into package');
+  for (const filename of ['update-filters.js', 'lib/filter-updater.js', 'docs/filter-updates.md']) {
+    assert.ok(included.has(filename), 'Missing maintenance package file: ' + filename);
+  }
   const consumer = path.join(temporary, 'consumer');
   fs.mkdirSync(consumer);
   fs.writeFileSync(path.join(consumer, 'package.json'), JSON.stringify({name: 'geizhals-package-smoke', version: '1.0.0', private: true}));
   npm(['install', '--offline', '--ignore-scripts', '--omit=optional', '--no-audit', '--no-fund', '--package-lock=false', path.join(temporary, packed.filename)], consumer);
-  const code = "const assert=require('node:assert/strict'); const api=require('geizhals-api'); for(const method of ['search','getListing','getItem','getTop10','getReviews','getURL','getFilters']) assert.equal(typeof api[method],'function',method); assert.equal(new URL(api.getURL('CPU')).searchParams.get('fs'),'CPU');";
-  const result = spawnSync(process.execPath, ['-e', code], {cwd: consumer, encoding: 'utf8', timeout: 20000});
+  const code = "const assert=require('node:assert/strict'); const api=require('geizhals-api'); for(const method of ['search','getListing','getItem','getTop10','getReviews','getURL','getFilters','refreshFilters']) assert.equal(typeof api[method],'function',method); assert.equal(new URL(api.getURL('CPU')).searchParams.get('fs'),'CPU');";
+  const result = spawnSync(process.execPath, ['-e', code], {cwd: consumer, encoding: 'utf8', timeout: 60000});
   assert.equal(result.status, 0, result.error?.message || result.stderr);
+  const help = spawnSync(process.execPath, [path.join(consumer, 'node_modules/geizhals-api/update-filters.js'), '--help'], {cwd: consumer, encoding: 'utf8', timeout: 60000});
+  assert.equal(help.status, 0, help.error?.message || help.stderr);
+  assert.match(help.stdout, /Usage:/);
   console.log('Packed ' + packed.filename + '; offline installation and public API consumer smoke test passed. No npm publication performed.');
 } finally {
   fs.rmSync(temporary, {recursive: true, force: true});
