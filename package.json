@@ -12,7 +12,8 @@
     "helper/**/*.js",
     "config/global.json",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "docs/**/*.md"
   ],
   "engines": {
     "node": ">=22.12.0"
