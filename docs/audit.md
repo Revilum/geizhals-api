@@ -28,6 +28,51 @@ The existing API proposal passed 14 tests. The follow-up reproduced additional f
 - Actual tarball, offline consumer installation and exported API smoke test passed.
 - CI results must be inspected on the PR head; the matrix configuration is not itself a successful run.
 
+## PR #2 review follow-up
+
+Inspected PR head: `6c2282729d63134820f88c1a30abd50e0ee4a40b`. The Copilot thread at
+https://github.com/Revilum/geizhals-api/pull/2#discussion_r4456466528
+was already marked outdated. At this head, `getFullSite` already installs request
+interception before navigating, validates each intercepted navigation/resource
+URL and checks the final URL. This follow-up preserves that implementation and
+adds explicit regression coverage; it does not claim that the old missing-policy
+bug was still present.
+
+- Added 11 mocked browser-policy tests for setup ordering, regional origins,
+  private/loopback IPv4 and IPv6 targets, URL schemes, credentials, ports,
+  lookalike hosts, navigation/resource redirect destinations and cleanup.
+- Fixed relative category images retaining the wrong `.de` origin when their
+  source page was on `.at` or `.eu`. Five tests cover the optional parser base URL,
+  endpoint forwarding, image/srcset sources, default behavior and absolute CDN URLs.
+- Made the `top10` homepage classification explicit in the README. German grouped
+  prices and shared array/object filter validation were already fixed and tested.
+- Reproduced a separate `packcheck` failure after seeding a new npm cache only with
+  `npm ci`: an unlocked offline consumer install required uncached registry
+  metadata and failed with `ENOTCACHED`. The check now builds a temporary consumer
+  lockfile from the repository's dependency graph and installs the actual local
+  tarball with `npm ci --offline`, preserving integrity checks. It also verifies
+  that the referenced audit document is packaged.
+
+Executed for this follow-up on Linux, Node 24.22.1 / npm 11.9.0:
+
+- `npm test`: **54 passed, 0 failed** (38 existing + 11 browser + 5 category tests).
+- `npm run check`: **18 JavaScript files** passed syntax checking.
+- `npm run packcheck`: actual tarball, offline installation and API smoke test passed.
+- Isolated cache reproduction: original check failed; corrected check passed using
+  the same cache seeded by `npm ci`. An intentionally missing packaged helper was
+  rejected. Project/cache paths containing spaces were also exercised.
+- `npm audit --omit=dev --audit-level=high`: **0 vulnerabilities reported**.
+- `git diff --check`: passed.
+
+These browser tests use mocked Puppeteer requests, not a real Chromium network
+integration. The documented page-scoped policy and publisher/CDN trust boundary
+remain; comprehensive browser-wide egress isolation is not established by these tests.
+
+The inspected fork workflow run `41686516269` failed all four jobs with no
+recorded steps and no runner name. Its logs were unavailable. These observations
+do not establish the cause of the remote failure, and local checks are not a
+substitute for a successful remote CI run.
+
 ## Deliberately not claimed as complete
 
 - Category-specific top-10 when the source page has no matching section.

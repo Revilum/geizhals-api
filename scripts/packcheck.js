@@ -25,15 +25,44 @@ function npm(args, cwd) {
 try {
   const [packed] = JSON.parse(npm(['pack', '--json', '--ignore-scripts', '--pack-destination', temporary], root));
   const included = new Set(packed.files.map(file => file.path));
-  for (const required of ['index.js', 'getURL.js', 'utils.js', 'endpoints/reviews.js', 'helper/getFilters.js', 'config/global.json', 'README.md', 'LICENSE']) {
+  for (const required of ['index.js', 'getURL.js', 'utils.js', 'endpoints/reviews.js', 'helper/getFilters.js', 'config/global.json', 'README.md', 'docs/audit.md', 'LICENSE']) {
     assert.ok(included.has(required), 'Missing packaged file: ' + required);
   }
   assert.ok(!included.has('endpoints/item.json'), 'Sample scraped output must not be packaged');
   assert.ok(![...included].some(file => /(^|\/)(node_modules|\.git|test|tmp)\//.test(file)), 'Development artifacts leaked into package');
   const consumer = path.join(temporary, 'consumer');
   fs.mkdirSync(consumer);
-  fs.writeFileSync(path.join(consumer, 'package.json'), JSON.stringify({name: 'geizhals-package-smoke', version: '1.0.0', private: true}));
-  npm(['install', '--offline', '--ignore-scripts', '--omit=optional', '--no-audit', '--no-fund', '--package-lock=false', path.join(temporary, packed.filename)], consumer);
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+  const sourceLock = JSON.parse(fs.readFileSync(path.join(root, 'package-lock.json'), 'utf8'));
+  assert.ok(sourceLock.lockfileVersion >= 2 && sourceLock.packages?.[''], 'A current package-lock.json is required');
+  const packageEntry = {...sourceLock.packages['']};
+  for (const field of ['name', 'version', 'dependencies', 'optionalDependencies', 'peerDependencies', 'peerDependenciesMeta']) {
+    assert.deepEqual(packageEntry[field], manifest[field], 'package-lock.json is out of date: ' + field);
+  }
+  assert.ok(!sourceLock.packages['node_modules/' + manifest.name], 'The package cannot depend on itself');
+  // npm ci caches locked tarballs, but not the registry metadata needed by
+  // npm install to resolve dependency ranges. Reuse that exact dependency graph
+  // for the consumer so the check also works with a freshly seeded CI cache.
+  const tarball = 'file:../' + packed.filename;
+  const consumerManifest = {
+    name: 'geizhals-package-smoke', version: '1.0.0', private: true,
+    dependencies: {[manifest.name]: tarball}
+  };
+  delete packageEntry.devDependencies;
+  packageEntry.resolved = tarball;
+  packageEntry.integrity = packed.integrity;
+  const consumerLock = {
+    name: consumerManifest.name, version: consumerManifest.version,
+    lockfileVersion: sourceLock.lockfileVersion, requires: true,
+    packages: {
+      ...sourceLock.packages,
+      '': consumerManifest,
+      ['node_modules/' + manifest.name]: packageEntry
+    }
+  };
+  fs.writeFileSync(path.join(consumer, 'package.json'), JSON.stringify(consumerManifest));
+  fs.writeFileSync(path.join(consumer, 'package-lock.json'), JSON.stringify(consumerLock));
+  npm(['ci', '--offline', '--ignore-scripts', '--omit=dev', '--omit=optional', '--no-audit', '--no-fund'], consumer);
   const code = "const assert=require('node:assert/strict'); const api=require('geizhals-api'); for(const method of ['search','getListing','getItem','getTop10','getReviews','getURL','getFilters']) assert.equal(typeof api[method],'function',method); assert.equal(new URL(api.getURL('CPU')).searchParams.get('fs'),'CPU');";
   const result = spawnSync(process.execPath, ['-e', code], {cwd: consumer, encoding: 'utf8', timeout: 20000});
   assert.equal(result.status, 0, result.error?.message || result.stderr);
