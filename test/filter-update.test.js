@@ -48,7 +48,7 @@ test('safe updater writes only verified, nonempty catalogs',async()=>{
     assert.equal(first.parsed,1);
     assert.equal(first.changed,1);
     assert.equal(calls.length,4);
-    const dest=path.join(dir,'hardware-m1','cpus-o5','amd-processors-cpuamdam4.json');
+    const dest=path.join(dir,'hardware-m1','cpus-o5','cat.cpuamdam4.json');
     assert.deepEqual(JSON.parse(fs.readFileSync(dest,'utf8')),updater.parseFilters(pages['cat:cpuamdam4']));
     const second=await updater.refreshFilters({fetchPage:fetchFixture(),delayMs:0,outputDir:dir,maxPages:10});
     assert.equal(second.changed,0);
@@ -60,7 +60,7 @@ test('errors fail without deleting old filter catalogs',async()=>{
   const dir=tmp();
   try{
     await updater.refreshFilters({fetchPage:fetchFixture(),delayMs:0,outputDir:dir,maxPages:10});
-    const file=path.join(dir,'hardware-m1','cpus-o5','amd-processors-cpuamdam4.json');
+    const file=path.join(dir,'hardware-m1','cpus-o5','cat.cpuamdam4.json');
     const before=fs.readFileSync(file,'utf8');
     await assert.rejects(updater.refreshFilters({fetchPage:fetchFixture({...pages,'cat:cpuamdam4':'<div>no filter DOM</div>'}),delayMs:0,outputDir:dir,maxPages:10}),/No nonempty filter data/);
     assert.equal(fs.readFileSync(file,'utf8'),before);

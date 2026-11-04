@@ -23,22 +23,29 @@ No Chromium, credentials or live requests are needed for unit tests. Live crawli
 - Bound HTTP response bytes and timeouts. Accept only `text/html`, `application/xhtml+xml`, `text/plain` or a missing Content-Type; optional parameters are allowed, different MIME subtypes are rejected.
 - Deduplicate navigation, skip services links and normalize filenames; rotate main categories, subcategories **and leaf categories**. Explicit offsets/limits are available at every level.
 - Stage parsed data in memory until crawling completes. On HTTP 401/403/429, no staged catalog is written, even if earlier pages parsed successfully.
-- Reject ambiguous normalized filter labels instead of silently choosing the wrong value.
-- Validate **all existing destination catalogs in the current batch** before the first write. A corrupt destination catalog does not allow an earlier prepared catalog to be partially updated. Unrelated catalogs are not scanned.
+- Normalize newly parsed filter group/choice labels with the same Unicode-aware function as the public API, without filename truncation. Repeated groups and repeated `xf` parameters retain their values; conflicting normalized labels reject instead of choosing one.
+- Validate **all existing destination catalogs in the current batch** before the first write, including token syntax and normalized group/choice uniqueness. Equivalent incoming labels match existing spellings without renaming those keys. A corrupt destination catalog does not allow an earlier prepared catalog to be partially updated.
+- Scan filenames (not unrelated JSON contents) within the output tree to detect exact-ID duplicates and ambiguous legacy candidates before writing. The scan skips directory symlinks and directories deeper than depth 4, matching public discovery. Exceeding 10,000 entries or encountering an identity conflict aborts before the write phase. A category mapped to multiple staged paths also rejects rather than creating an ambiguous catalog set.
 - Reject destination names or directory components differing only by case, both within the staged batch and against existing paths, before writing. This keeps Linux-generated catalogs safe to use on case-insensitive filesystems. Resolve ambiguous legacy paths manually; no file is renamed or deleted automatically.
 - Preserve old groups and choices absent from returned HTML. This prevents truncated filter pages from erasing known data. It also deliberately retains possibly stale entries, which need manual review.
 - Write changed files using a unique temporary file and rename, cleaning temporary files on failure. Each file replacement is atomic; the full multi-file batch is **not** a transactional filesystem operation. Disk failure can leave earlier files committed and later files untouched.
 - Dry runs parse, merge and report changes without creating the output directory or modifying files.
-- Return `partial` and sorted `partialReasons` (budget, category/subcategory/leaf limits, empty pages/navigation, request errors and `retained-existing-choices`), not merely a deceptively complete success flag. Retaining an old choice signals incomplete observed coverage even when all selected pages were fetched.
+- Return `partial` and sorted `partialReasons` (budget, category/subcategory/leaf limits, empty pages/navigation, request errors, `invalid-navigation`, `invalid-filter-page` and `retained-existing-choices`), not merely a deceptively complete success flag. Rejected navigation/filter candidates and retained old choices signal incomplete observed coverage even when all selected pages were fetched. Known expansion controls, unrelated navigation and duplicate identical links do not imply partial coverage.
 - Never delete a catalog or automatically merge a PR.
 
 A file currently has this layout:
 
 ```text
-filters/<main-label>-m<id>/<sub-label>-o<id>/<leaf-label>-<cat>.json
+filters/<main-label>-m<id>/<sub-label>-o<id>/cat.<cat>.json
 ```
 
-The API's `filterDir` lookup can discover these generated files by explicit leaf `cat`. Human-readable labels are normalized; validated identifiers retain their exact spelling and full length so that generation and lookup agree. More than one matching catalog is an error; specify `filterFile` to disambiguate. Label changes can create a second path, so review duplicate/stale catalogs manually. Earlier updater versions lowercased/truncated identifiers: inspect affected legacy files before replacing them; this change does not delete or automatically migrate old catalogs.
+The API's `filterDir` lookup matches the complete identity filename `cat.<cat>.json` or an explicit ID-only `<cat>.json`. It no longer infers an ID from a human-readable filename suffix: `shared-a-foo.json` cannot establish whether the category is `foo` or `a-foo`. Exact category spelling and full length are preserved. The fixed leaf filename also remains stable when the leaf's human label changes. More than one identity-safe match is an error; specify `filterFile` to select a known catalog.
+
+### Compatibility with existing catalogs
+
+This is an intentional compatibility change for automatic `filterDir` discovery. Legacy `<label>-<cat>.json` files still work with an explicit `filterFile`, which leaves category/path selection with the caller. Without a new identity-safe match, automatic lookup rejects ambiguous legacy suffix matches with an actionable error.
+
+If refresh would create a new target while a legacy candidate exists, or an exact-ID catalog already exists at another path, it aborts before writing any file. This includes ID-only files and catalogs under renamed parent directories. Manually verify the category identity and reconcile retained choices before migrating a file to the documented layout. Do not infer an ambiguous ID solely from its old suffix. When the intended new target exists, ambiguous legacy suffix files remain untouched and the new target is authoritative; additional exact-ID files still reject. No automatic rename, deletion or migration is performed.
 
 ## Weekly/manual GitHub workflow
 

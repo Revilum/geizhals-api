@@ -86,7 +86,7 @@ const url = gh.getURL({
 Search, listing and top-10 builders require a homepage or index path in `url`.
 An explicit listing/top-10 operation removes inherited `fs`/`asuch` search
 parameters, so a copied search URL cannot silently change the requested operation.
-Category parameters inherited from `url` receive the same validation as explicit options.
+Category parameters and `xf` filters inherited from `url` receive the same validation and token budget as explicit options. Repeated category or price parameters must agree; conflicting values reject instead of depending on which value the website reads. Explicit options replace all inherited values for that parameter.
 
 For named filters, a JSON catalog maps labels to raw values:
 
@@ -99,11 +99,11 @@ const url = gh.getURL({
   type: 'listing',
   cat: 'cpuamdam4',
   filters: {manufacturer: 'AMD', memory: '16'},
-  filterFile: './filters/hardware/processors-cpuamdam4.json'
+  filterFile: './filters/hardware/cat.cpuamdam4.json'
 });
 ```
 
-The file must exist. Alternatively set `filterDir: './filters'` and omit `filterFile`: a bounded, non-symlink-following scan selects exactly one `<cat>.json` or `*-<cat>.json` file. Missing or ambiguous catalogs raise an error; an explicit `filterFile` takes precedence. Numeric labels such as `16` are resolved through the catalog rather than silently becoming a raw filter ID. Unknown labels and malformed catalogs are rejected.
+The file must exist. Alternatively set `filterDir: './filters'` and omit `filterFile`: a bounded, non-symlink-following scan selects exactly one `cat.<cat>.json` or ID-only `<cat>.json` file. Legacy `<label>-<cat>.json` filenames are ambiguous for IDs containing hyphens and require an explicit `filterFile`; they are not automatically migrated or deleted. Missing or ambiguous catalogs raise an error; an explicit `filterFile` takes precedence. Numeric labels such as `16` resolve through the catalog rather than silently becoming a raw filter ID. Unknown labels, ambiguous normalized names and malformed catalogs are rejected. Both filter parsers retain repeated groups and `xf` values; long/Unicode labels use the same normalization as named lookup.
 
 `parsePrice` preserves the original string return convention (`€1299.00`), recognizes German thousands separators, and returns `null` for unavailable or malformed prices. Missing numeric merchant ratings retain the legacy `0` convention; a missing price is never reported as zero.
 
@@ -143,7 +143,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow and propose
 
 - `npm test`: deterministic offline unit/regression tests using Node's test runner, without shell globs.
 - `npm run check`: syntax-checks all JavaScript source, helpers, tests and maintenance scripts, not just the main endpoints.
-- `npm run packcheck`: actual tarball + offline consumer installation + exported API smoke test.
+- `npm run packcheck`: actual tarball + offline consumer installation + public parser/catalog/URL and injected refresh/lookup/idempotence checks, plus installed CLI help.
 - `npm audit --omit=dev --audit-level=high`: online dependency advisory check.
 
 CI is configured for Linux on Node 22/24/26 and Windows on Node 24. Fork/external PR jobs may require maintainer approval. Catalog PRs created with `GITHUB_TOKEN` stay draft until a maintainer marks them Ready for review, which triggers checks; later bot updates make them draft again. Manual filter refresh must select the default branch. Configuring CI is not proof that the remote jobs have passed.

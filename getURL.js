@@ -46,6 +46,7 @@ function resolveFilterFile(options) {
     throw new TypeError('filterDir requires a directory and an explicit valid cat');
   }
   const matches = [];
+  let legacyMatch = false;
   const pending = [{directory: path.resolve(options.filterDir), depth: 0}];
   let entries = 0;
   while (pending.length) {
@@ -54,10 +55,14 @@ function resolveFilterFile(options) {
       if (++entries > 10000) throw new RangeError('Filter directory scan limit exceeded; use filterFile');
       const location = path.join(directory, entry.name);
       if (entry.isDirectory() && depth < 4) pending.push({directory: location, depth: depth + 1});
-      if (entry.isFile() && (entry.name === cat + '.json' || entry.name.endsWith('-' + cat + '.json'))) {
-        matches.push(location);
+      if (entry.isFile()) {
+        if (entry.name === cat + '.json' || entry.name === 'cat.' + cat + '.json') matches.push(location);
+        else if (!entry.name.startsWith('cat.') && entry.name.endsWith('-' + cat + '.json')) legacyMatch = true;
       }
     }
+  }
+  if (!matches.length && legacyMatch) {
+    throw new RangeError('Ambiguous legacy catalog filenames for ' + cat + '; use an explicit filterFile or refresh the catalog');
   }
   if (matches.length !== 1) throw new RangeError('Expected exactly one filter catalog for ' + cat + '; found ' + matches.length);
   return matches[0];
@@ -74,6 +79,19 @@ function filterValues(filters, filterFile) {
     if (!record(catalog) || !Object.values(catalog).every(record)) {
       throw new TypeError('Filter catalog must map group names to objects');
     }
+    const groups = new Map();
+    for (const [label, choices] of Object.entries(catalog)) {
+      const name = parseText(label);
+      if (groups.has(name)) throw new RangeError('Ambiguous filter group: ' + label);
+      const normalized = new Map();
+      for (const [choice, value] of Object.entries(choices)) {
+        const key = parseText(choice);
+        if (normalized.has(key)) throw new RangeError('Ambiguous filter label: ' + label + '/' + choice);
+        normalized.set(key, value);
+      }
+      groups.set(name, normalized);
+    }
+    catalog = groups;
   }
   const values = [];
   if (Array.isArray(filters)) {
@@ -88,10 +106,10 @@ function filterValues(filters, filterFile) {
           else throw new TypeError('filterFile or filterDir is required for named filters');
           continue;
         }
-        const group = Object.entries(catalog).find(([label]) => parseText(label) === parseText(key))?.[1];
-        const found = group && Object.entries(group).find(([label]) => parseText(label) === parseText(value));
-        if (!found) throw new RangeError('Unknown filter: ' + key + '=' + String(value));
-        values.push(...tokens(found[1]));
+        const group = catalog.get(parseText(key));
+        const name = parseText(value);
+        if (!group?.has(name)) throw new RangeError('Unknown filter: ' + key + '=' + String(value));
+        values.push(...tokens(group.get(name)));
       }
     }
   } else {
@@ -110,6 +128,12 @@ function validPrice(value, name) {
     throw new RangeError(name + ' must be a finite nonnegative price');
   }
   return amount;
+}
+
+function inheritedPrice(params, key, name, fallback) {
+  const values = params.getAll(key).map(value => validPrice(value, name));
+  if (values.some(value => value !== values[0])) throw new RangeError('Conflicting ' + name + ' values');
+  return values[0] ?? fallback;
 }
 
 function categoryValue(key, value) {
@@ -156,21 +180,24 @@ function getURL(options = {}) {
   }
   // URL-derived parameters must satisfy the same contract as explicit options.
   for (const key of ['m', 'o', 'cat']) {
-    for (const value of params.getAll(key)) categoryValue(key, value);
+    const values = params.getAll(key).map(value => categoryValue(key, value));
+    if (new Set(values).size > 1) throw new RangeError('Conflicting category parameter: ' + key);
   }
   if (type === 'listing' && !['m', 'o', 'cat'].some(key => params.has(key))) {
     throw new TypeError('A listing requires m, o or cat');
   }
   if (options.minPrice != null) params.set('bpmin', String(validPrice(options.minPrice, 'minPrice')));
   if (options.maxPrice != null) params.set('bqmax', String(validPrice(options.maxPrice, 'maxPrice')));
-  const min = params.has('bpmin') ? validPrice(params.get('bpmin'), 'minPrice') : 0;
-  const max = params.has('bqmax') ? validPrice(params.get('bqmax'), 'maxPrice') : Infinity;
+  const min = inheritedPrice(params, 'bpmin', 'minPrice', 0);
+  const max = inheritedPrice(params, 'bqmax', 'maxPrice', Infinity);
   if (min > max) throw new RangeError('minPrice must not exceed maxPrice');
   if (options.filters != null) {
     const file = resolveFilterFile({...options, cat: options.cat ?? options.finalCategory ?? params.get('cat')});
     const values = filterValues(options.filters, file);
     params.delete('xf');
     if (values.length) params.set('xf', values.join('~'));
+  } else {
+    filterValues(params.getAll('xf'));
   }
   return url.href;
 }

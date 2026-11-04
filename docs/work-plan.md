@@ -1,5 +1,11 @@
 # Coordinated PR work plan — 2026-11-03
 
+## Second follow-up review — 2026-11-04
+
+Starting at `383d959`, the additional review checked catalog identity and parser/consumer contracts, repaired reproduced defects and added the Operator-approved project context. Final local validation passes 131 tests, 28 syntax files, the offline demo, actual installed consumer round trips, audit and workflow lint. Independent review supplied additional preservation/partial-coverage cases; all accepted findings were repaired and revalidated. See [second review](review-2026-11-04-second-pass.md) and [current verification](verification-status.md).
+
+The automatic catalog naming/lookup change is intentional and documented: exact `cat.<id>.json` filenames replace ambiguous label suffix inference, while explicit `filterFile` retains access to old files. No existing data migration, live workflow activation, merge or npm publication occurs. Hosted billing and live-site compatibility remain separate prerequisites.
+
 ## Follow-up review — 2026-11-04
 
 PR #3 was rechecked at `1018eab`, repaired and reviewed in an isolated checkout. Independent owners reviewed maintenance, public API/network behavior and CI/package standards. Five code defects and one CI-trigger defect were addressed; a Windows path collision found during cross-review was repaired before delivery. The final local suite passes 94 tests, syntax checks 25 files, and demo/package/audit/workflow lint checks pass. [Review details](review-2026-11-04.md) and [current verification](verification-status.md) supersede the historical counts below.

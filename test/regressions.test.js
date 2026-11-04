@@ -89,7 +89,7 @@ test('filterDir automatically selects a unique category catalog and rejects ambi
   const dir = temporary(t);
   const nested = path.join(dir, 'hardware-m1', 'processors-o4');
   fs.mkdirSync(nested, {recursive: true});
-  const file = path.join(nested, 'processors-cpuamdam4.json');
+  const file = path.join(nested, 'cat.cpuamdam4.json');
   fs.writeFileSync(file, JSON.stringify({memory: {'16': '132_16384'}}));
   const options = {type: 'listing', cat: 'cpuamdam4', filterDir: dir, filters: {memory: '16'}};
   assert.equal(new URL(api.getURL(options)).searchParams.get('xf'), '132_16384');

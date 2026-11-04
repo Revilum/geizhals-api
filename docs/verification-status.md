@@ -1,5 +1,23 @@
 # Verification status — 2026-11-04
 
+## Second review: catalog and installed-consumer contracts
+
+Starting revision: `383d959b2064f3b2340fa5cfc1202c02a362b8db`. This follow-up fixes the independently reproduced catalog identity, normalization, parsing, stored-token, partial-coverage and inherited-parameter findings described in [the second review](review-2026-11-04-second-pass.md). The Operator approved the new `PROJECT-CONTEXT.md` baseline. Earlier results below remain historical evidence.
+
+Windows / Node 24.14.1 / npm 11.11.0:
+
+- Fresh starting suite: **94/94**; final repaired suite: **131/131** tests, including 37 new tests.
+- Syntax: **28 JavaScript files**; synthetic offline demo passed.
+- Locked install into an isolated seed directory: **50 packages**, lifecycle scripts disabled; task-local cache reused by the offline consumer.
+- Actual installed tarball: parser/catalog/URL and injected-refresh/discovery/URL round trips, unchanged repeated refresh, exported API and installed CLI help all passed.
+- Production dependency audit: **0 reported vulnerabilities**. Both unchanged workflows pass actionlint 1.7.12 (shellcheck/pyflakes integrations disabled).
+- Independent review: **66 focused tests**, then **18 affected integrity tests** rerun after its final malformed-link finding was repaired; no remaining actionable finding. Root reran all 131 tests, syntax and package checks after that last repair.
+- `git diff --check` passed. No performance benchmark or coverage percentage is claimed.
+
+Automatic catalog discovery now requires exact `cat.<id>.json` or ID-only `<id>.json` names; ambiguous legacy suffix paths require explicit `filterFile` or reviewed migration. Existing files are not automatically renamed/deleted. The filename-only preflight scan follows public discovery's bounded depth/entry rules; it does not parse unrelated JSON files or provide filesystem sandboxing. Multi-file writes remain nontransactional.
+
+The prior exact-source hosted run `41820640882` was rechecked and still reports a billing lock before jobs start. The final PR delivery record identifies any new run after this source change is pushed. No live request, refresh dispatch, opt-in, billing/policy change, merge or npm publication occurred during this follow-up. Live markup and real Chromium-wide isolation remain unverified.
+
 ## Review and repair of PR #3
 
 Starting revision: `1018eab8092d281facf5b69ace9fc4609dce1dc8`. The follow-up change preserves the integration history and draft status. See [review findings](review-2026-11-04.md) for reproduced failures, scoped standards and remaining limitations.

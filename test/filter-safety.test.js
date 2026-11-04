@@ -34,7 +34,7 @@ function fixture(overrides = {}, calls = []) {
     return value;
   };
 }
-const destination = dir => path.join(dir, 'hardware-m1', 'cpus-o5', 'amd-processors-cpuamdam4.json');
+const destination = dir => path.join(dir, 'hardware-m1', 'cpus-o5', 'cat.cpuamdam4.json');
 
 for (const status of [401, 403, 429]) {
   test('HTTP ' + status + ' stops after the first blocked page, before any staged write', async t => {
@@ -54,7 +54,7 @@ for (const status of [401, 403, 429]) {
     assert.equal(calls.length, 5);
     assert.ok(!calls.some(url => url.includes('never')));
     assert.equal(fs.readFileSync(destination(dir), 'utf8'), before);
-    assert.deepEqual(fs.readdirSync(path.dirname(destination(dir))), ['amd-processors-cpuamdam4.json']);
+    assert.deepEqual(fs.readdirSync(path.dirname(destination(dir))), ['cat.cpuamdam4.json']);
   });
 }
 
@@ -160,7 +160,7 @@ test('case-only catalog IDs abort the whole staged batch before writing', async 
 
 test('case-only existing catalog names are preserved and reject later refreshes', async t => {
   const dir = temporary(t);
-  const existing = path.join(dir, 'hardware-m1', 'cpus-o5', 'same-Foo.json');
+  const existing = path.join(dir, 'hardware-m1', 'cpus-o5', 'cat.Foo.json');
   const original = JSON.stringify({manufacturer: {choice: '1_UPPER'}});
   fs.mkdirSync(path.dirname(existing), {recursive: true});
   fs.writeFileSync(existing, original);
@@ -168,7 +168,7 @@ test('case-only existing catalog names are preserved and reject later refreshes'
     'cat:foo': filters([['Choice', '1_lower']])};
   await assert.rejects(updater.refreshFilters({outputDir: dir, fetchPage: fixture(pages), delayMs: 0}), /catalog path casing/i);
   assert.equal(fs.readFileSync(existing, 'utf8'), original);
-  assert.deepEqual(fs.readdirSync(path.dirname(existing)), ['same-Foo.json']);
+  assert.deepEqual(fs.readdirSync(path.dirname(existing)), ['cat.Foo.json']);
 });
 
 test('case-only staged directories are rejected even when leaf filenames differ', async t => {
@@ -197,7 +197,7 @@ test('malformed later catalog stops the batch before an earlier catalog is chang
   const dir = temporary(t);
   fs.mkdirSync(path.dirname(destination(dir)), {recursive: true});
   fs.writeFileSync(destination(dir), '{"manufacturer":{"old":"7781_Old"}}');
-  const corrupt = path.join(path.dirname(destination(dir)), 'bad-catalog-badcat.json');
+  const corrupt = path.join(path.dirname(destination(dir)), 'cat.badcat.json');
   fs.writeFileSync(corrupt, '{corrupt');
   const before = fs.readFileSync(destination(dir), 'utf8');
   await assert.rejects(updater.refreshFilters({outputDir: dir, delayMs: 0, fetchPage: fixture({
@@ -238,7 +238,9 @@ test('rotation wraps main categories instead of silently truncating at the last 
   const calls = [];
   const pages = {
     '/': home + '<a class="nav-m-link" href="/?m=2">Electronics</a>',
-    'm:2': subs
+    'm:2': '<div class="mocat-item"><a href="/?o=6">Audio</a></div>',
+    'o:6': '<div class="mocat-item"><a href="/?cat=audio">Audio devices</a></div>',
+    'cat:audio': filters()
   };
   const result = await updater.refreshFilters({outputDir: temporary(t), fetchPage: fixture(pages, calls), delayMs: 0,
     rotate: true, now: 7 * 86400000, categoryLimit: 2});

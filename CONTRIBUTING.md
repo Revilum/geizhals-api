@@ -16,7 +16,7 @@ npm audit --omit=dev --audit-level=high
 git diff --check
 ```
 
-Tests and the demo use synthetic fixtures and do not crawl. `packcheck` builds a real tarball, installs it offline, and checks its public API and installed maintenance command. Seed the same npm cache with `npm ci`; do not substitute an existing checkout import for an installed consumer. Dependency installation and audit contact the package registry. Optional Puppeteer installation and live website checks are separate.
+Tests and the demo use synthetic fixtures and do not crawl. `packcheck` builds a real tarball, installs it offline, and checks its public API and installed maintenance command. Its installed consumer exercises parser-to-catalog-to-URL and injected refresh-to-discovery-to-URL round trips, including long/Unicode names, repeated `xf` values and an unchanged second refresh. Seed the same npm cache with `npm ci`; do not substitute an existing checkout import for an installed consumer. Dependency installation and audit contact the package registry. Optional Puppeteer installation and live website checks are separate.
 
 For behavioral repairs, record a failing regression before the fix, then run the affected tests and the full suite. Include a normal input and the failure/preservation case. Style-only changes do not need invented tests. Report the environment, tested revision and actual results; fixtures do not establish current website compatibility. Optimize only against a concrete problem and record measurements before claiming a speed or resource improvement.
 

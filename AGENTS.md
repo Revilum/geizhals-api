@@ -4,7 +4,7 @@ These instructions apply to this repository only. See CONTRIBUTING.md for the de
 
 - Inspect the current PR head and affected callers before changing behavior. Fix reproduced correctness/security defects; keep unrelated redesigns separate.
 - For a behavior fix, add an offline regression that fails before the change and passes afterward. Cover the normal case and the relevant rejection or preservation case. Use fixtures or injected clients; never run the bare maintenance CLI as a test.
-- Preserve valid identifiers exactly across generation, filenames and lookup. Normalize human-readable labels separately; prove that distinct identifiers remain distinct. Reject case-only destination collisions before writes so Linux and Windows retain the same data.
+- Preserve valid identifiers exactly across generation, filenames and lookup. Normalize human-readable labels separately; use unambiguous identifier boundaries, not label suffixes. Prove that distinct identifiers remain distinct. Reject case-only destination collisions before writes so Linux and Windows retain the same data.
 - Accept only documented response media types, including their optional parameters. Missing or partial input must not become a complete catalog result or erase existing choices.
 - Run the checks in CONTRIBUTING.md, including a real installed tarball when changing package/public/CLI behavior. Use the lockfile and the same npm cache for installation and offline consumer checks.
 - Keep local test evidence, hosted CI results and live-site compatibility separate. A billing lock or HTTP access restriction is external evidence, not a reason to bypass safeguards or claim tests passed remotely.

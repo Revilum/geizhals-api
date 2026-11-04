@@ -66,7 +66,7 @@ try {
   fs.writeFileSync(path.join(consumer, 'package.json'), JSON.stringify(consumerManifest));
   fs.writeFileSync(path.join(consumer, 'package-lock.json'), JSON.stringify(consumerLock));
   npm(['ci', '--offline', '--ignore-scripts', '--omit=dev', '--omit=optional', '--no-audit', '--no-fund'], consumer);
-  const code = "const assert=require('node:assert/strict'); const api=require('geizhals-api'); for(const method of ['search','getListing','getItem','getTop10','getReviews','getURL','getFilters','refreshFilters']) assert.equal(typeof api[method],'function',method); assert.equal(new URL(api.getURL('CPU')).searchParams.get('fs'),'CPU');";
+  const code = fs.readFileSync(path.join(root, 'scripts', 'consumer-smoke.js'), 'utf8');
   const result = spawnSync(process.execPath, ['-e', code], {cwd: consumer, encoding: 'utf8', timeout: 20000});
   assert.equal(result.status, 0, result.error?.message || result.stderr);
   const installedManifest = JSON.parse(fs.readFileSync(path.join(consumer, 'node_modules', manifest.name, 'package.json'), 'utf8'));
