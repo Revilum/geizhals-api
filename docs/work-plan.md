@@ -1,0 +1,47 @@
+# Coordinated PR work plan — 2026-11-03
+
+## Second follow-up review — 2026-11-04
+
+Starting at `383d959`, the additional review checked catalog identity and parser/consumer contracts, repaired reproduced defects and added the Operator-approved project context. Final local validation passes 131 tests, 28 syntax files, the offline demo, actual installed consumer round trips, audit and workflow lint. Independent review supplied additional preservation/partial-coverage cases; all accepted findings were repaired and revalidated. See [second review](review-2026-11-04-second-pass.md) and [current verification](verification-status.md).
+
+The automatic catalog naming/lookup change is intentional and documented: exact `cat.<id>.json` filenames replace ambiguous label suffix inference, while explicit `filterFile` retains access to old files. No existing data migration, live workflow activation, merge or npm publication occurs. Hosted billing and live-site compatibility remain separate prerequisites.
+
+## Follow-up review — 2026-11-04
+
+PR #3 was rechecked at `1018eab`, repaired and reviewed in an isolated checkout. Independent owners reviewed maintenance, public API/network behavior and CI/package standards. Five code defects and one CI-trigger defect were addressed; a Windows path collision found during cross-review was repaired before delivery. The final local suite passes 94 tests, syntax checks 25 files, and demo/package/audit/workflow lint checks pass. [Review details](review-2026-11-04.md) and [current verification](verification-status.md) supersede the historical counts below.
+
+The current source-fork run at that baseline was independently confirmed to be blocked by account billing before test execution. Draft status and explicit crawler opt-in remain. Scoped contribution/agent standards were added; maintainer settings remain proposals. No global always-on process, merge, npm publication, live crawler or repository setting change is part of this follow-up.
+
+## Goal and agreed result
+
+Deliver a runnable, verified Node.js library through PR #2, integrate its repairs with the bounded maintenance implementation in PR #3, and provide transparent Codex co-authorship for both contributions. PR #3 remains a validated draft while live filter extraction is unverified. Scheduled crawling stays disabled unless a maintainer deliberately opts in.
+
+## Phases and evidence
+
+| Phase | Owner | Dependency | Acceptance and current evidence |
+| --- | --- | --- | --- |
+| Preserve/reconcile | Main contributor | None | Preserve prior work and public history; recheck current source heads before normal updates. API starting head `3a05d8c`; maintenance starting head `f344279`. |
+| Repair API, PR #2 | API contributor and independent reviewer | Preserve/reconcile | Published commit `11c1f17`: URL operation/category checks, rendered response validation, offline demo and obsolete updater containment. Windows / Node 24.14.1: 63 tests, 22 syntax files, demo, package consumer and audit passed. |
+| Integrate maintenance, PR #3 | Maintenance contributor | Tested PR #2 | Merge API history while retaining functional guarded updater, bounds, existing catalog choices, exports and npm binary. Combined tree: 85 tests, 25 syntax files, demo and real offline package/installed CLI checks passed. |
+| Independent review and attribution | Separate reviewer and main contributor | Integrated tree | Independent reviewer passed 31 focused offline tests and found no actionable code/security findings. Preserve human authorship and credit OpenAI Codex in the PR descriptions, documentation and new commit trailers. |
+| Delivery/readiness | Main contributor; maintainer for external gates | Verified branches | Publish reviewed source updates without rewriting history. Keep PR #3 draft and report actual checks. Upstream merging, npm publication, billing changes and crawler activation are separate actions. |
+
+## Integration rules
+
+- PR #2 temporarily disables the obsolete updater; PR #3 replaces that stub with its bounded functional CLI.
+- Keep the API signatures and regional parser behavior. Preserve URL validation, browser request policy, media checks and cleanup.
+- Test maintenance import, help and invalid arguments without crawling. The real no-argument CLI initiates a refresh and is never used in deterministic tests.
+- Preserve the lockfile-based offline consumer installation and verify updater exports, packaged files, bin metadata and actual installed command help.
+- Reconcile package and lockfile metadata; retain the offline demo alongside maintenance commands.
+- Preserve existing catalogs on blocked, malformed or incomplete input. Keep request budgets, delays, dry-run behavior and staged validation.
+- New commits include `Co-authored-by: Codex <noreply@openai.com>`. Preserve existing public commit history and use normal branch updates.
+
+## Validation and external gates
+
+The integrated revision passes locked installation, all 85 deterministic tests, all 25 JavaScript syntax checks, the offline demo, package/consumer verification and whitespace checks. The isolated npm cache was seeded by locked installation; package and CLI checks ran offline afterward. See `verification-status.md` for exact results and limitations.
+
+GitHub-hosted jobs currently stop before execution because of an account billing lock. Remote CI is not claimed green. Recheck the account condition before rerunning; a source change cannot resolve it.
+
+Prior live requests for search, category listings and filter pages returned HTTP 403. No access-control bypass is implemented. Current filter markup and permitted live extraction remain unverified. The refresh workflow requires explicit manual dispatch or `ENABLE_FILTER_REFRESH=true`; no schedule opt-in was set and no refresh was dispatched by this work.
+
+Recommended maintainer merge order: **PR #2, then PR #3**. Recheck the remaining PR #3 diff if PR #2 is squash-merged or rebased. Keep PR #3 draft until its live extraction prerequisites are verified.

@@ -1,73 +1,90 @@
-const fs = require("fs")
-const {sleep, getDirectories} = require("./utils")
-const {getCategories} = require("./helper/GetCategories")
-const {getSubCategories} = require("./helper/getSubCategories")
-const {getFinalCategories} = require("./helper/getFinalCategories")
-const {getFilters} = require("./helper/getFilters")
+#!/usr/bin/env node
+'use strict';
 
+const {refreshFilters} = require('./lib/filter-updater');
 
-const config = JSON.parse(fs.readFileSync('./config/global.json', 'utf-8'))
-const keys = config.categories
+const HELP = `Usage: node update-filters.js [options]
 
-if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp')
+  --dry-run                    Parse and report without writing catalog files
+  --rotate                     Rotate main, subcategory and leaf-category traversal weekly
+  --output PATH                Output directory (default: ./filters)
+  --max-pages N                Request budget: 1..300 (default: 80)
+  --delay-ms N                 Delay between live requests: 1000..60000 (default: 3000)
+  --category-offset N          Starting main-category index (0..1000000)
+  --category-limit N           Main categories per run (1..1000000)
+  --subcategory-offset N       Starting subcategory index (0..1000000)
+  --subcategory-limit N        Subcategories per selected main category (1..1000000)
+  --final-category-offset N    Starting leaf-category index (0..1000000)
+  --final-category-limit N     Leaf categories per selected subcategory (1..1000000)
+  --help, -h                   Display this help without making requests
 
-// setInterval(async function() {
-async function main() {
-    const categories = await getCategories()
-    await sleep()
-    fs.writeFile("./tmp/categories.json", JSON.stringify(categories, null, 4), err => {if (err) throw err})
-    let categoryDirectories = getDirectories('./tmp') // check all folders
-    for (const category in categories) {
-        if (!fs.existsSync('./tmp/' + category)) { // create folder for category if it doesn't exist
-            fs.mkdirSync('./tmp/' + category)
-        } else {
-            categoryDirectories = categoryDirectories.filter(item => item !== category) // array will contain only redundant folders in the end for deletion
-        }
-        const subCategoryURL = new URL(config.baseurl)
-        subCategoryURL.searchParams.append(keys.subCat, categories[category].param)
-        const subCategories = await getSubCategories(subCategoryURL.href)
-        await sleep()
-        console.log(subCategoryURL.href)
-        fs.writeFile('./tmp/' + category + '/' + category + '.json', JSON.stringify(subCategories, null, 4), err => {if (err) throw err})
-        let subcategoryDirectories = []
-        for (const subCategory in subCategories) {
-            if (!fs.existsSync('./tmp/' + category + '/' + subCategory)) { // create folder for subcategory if it doesn't exist
-                fs.mkdirSync('./tmp/' + category + '/' + subCategory)
-            } else {
-                subcategoryDirectories = subcategoryDirectories.filter(item => item !== subCategory) // array will contain only redundant folders in the end for deletion
-            }
-            const finalCategoryURL = new URL(config.baseurl)
-            finalCategoryURL.searchParams.append(keys.final, subCategories[subCategory].param)
-            const finalCategories = await getFinalCategories(finalCategoryURL.href)
-            await sleep()
-            console.log(finalCategoryURL.href)
-            let existingFilters = []
-            fs.readdirSync('./tmp/' + category + '/' + subCategory + '/', (err, files) => {
-                if(err) throw err
-                files.forEach(file => existingFilters.push(file))
-            })
-            for (const finalCategory in finalCategories) {
-                console.log(existingFilters)
-                const productListURL = new URL(config.baseurl)
-                productListURL.searchParams.append(keys.page, finalCategories[finalCategory].param)
-                const finalListing = await getFilters(productListURL.href)
-                await sleep()
-                console.log(productListURL.href)
-                if (fs.existsSync('./tmp/' + category + '/' + subCategory + '/' + finalCategory + '.json')) {
-                    existingFilters = existingFilters.filter(item => item !== finalCategory)
-                }
-                fs.writeFile('./tmp/' + category + '/' + subCategory + '/' + finalCategory + '.json', JSON.stringify(finalListing, null, 4), err => {if (err) throw err})
-            }
-            existingFilters.forEach(file => fs.unlink('./tmp/' + category + '/' + subCategory + '/' + file + '.json', err => {if (err) throw err}))
-        }
-        for (const dir in subcategoryDirectories) {
-            fs.rmSync('./tmp/' + category + '/' + dir, {recursive: true, force: true})  // delete all old filters
-        }
+HTTP 401/403/429 stop the entire crawl before staged catalogs are written.
+Existing entries absent from a fetched page are retained for manual review.
+No publication, default-branch push or merge is performed by this command.
+`;
+
+function parseOptions(argv) {
+  const opts = {};
+  const numeric = {
+    '--max-pages': ['maxPages', 1, 300],
+    '--delay-ms': ['delayMs', 1000, 60000],
+    '--category-offset': ['categoryOffset', 0, 1000000],
+    '--category-limit': ['categoryLimit', 1, 1000000],
+    '--subcategory-offset': ['subcategoryOffset', 0, 1000000],
+    '--subcategory-limit': ['subcategoryLimit', 1, 1000000],
+    '--final-category-offset': ['finalCategoryOffset', 0, 1000000],
+    '--final-category-limit': ['finalCategoryLimit', 1, 1000000]
+  };
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--help' || arg === '-h') { opts.help = true; continue; }
+    if (arg === '--dry-run') { opts.dryRun = true; continue; }
+    if (arg === '--rotate') { opts.rotate = true; continue; }
+    if (arg === '--output') {
+      const value = argv[++i];
+      if (typeof value !== 'string' || !value.trim() || value.startsWith('-')) {
+        throw new TypeError('Missing --output path');
+      }
+      opts.outputDir = value;
+      continue;
     }
-    for (const dir in categoryDirectories) {
-        fs.rmSync('./tmp/' + dir, {recursive: true, force: true})  // delete all old filters
+    if (Object.hasOwn(numeric, arg)) {
+      const value = argv[++i];
+      if (!/^\d+$/.test(String(value ?? ''))) {
+        throw new TypeError('Expected a nonnegative integer for ' + arg);
+      }
+      const [key, min, max] = numeric[arg];
+      const number = Number(value);
+      if (arg === '--delay-ms' && number < 1000) {
+        throw new RangeError('Use at least 1000 ms between live requests');
+      }
+      if (!Number.isSafeInteger(number) || number < min || number > max) {
+        throw new RangeError(arg + ' must be an integer between ' + min + ' and ' + max);
+      }
+      opts[key] = number;
+      continue;
     }
-// }, 1000 * 60 * 60 * 24)
+    throw new TypeError('Unknown command-line option: ' + arg);
+  }
+  return opts;
 }
 
-main().then()
+async function main(argv = process.argv.slice(2)) {
+  const opts = parseOptions(argv);
+  if (opts.help) { console.log(HELP); return null; }
+  const result = await refreshFilters(opts);
+  console.log(JSON.stringify(result, null, 2));
+  if (result.partial) {
+    console.warn('Partial catalog coverage: ' + result.partialReasons.join(', ') + '. Review before merging.');
+  }
+  return result;
+}
+
+if (require.main === module) {
+  main().catch(error => {
+    console.error('Filter refresh stopped:', error.message);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = {parseOptions, main, HELP};

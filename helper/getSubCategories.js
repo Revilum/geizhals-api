@@ -1,24 +1,25 @@
-const {getSite, parseText, getParam} = require("../utils")
-const cheerio = require("cheerio")
-const fs = require("fs")
+'use strict';
 
-const config = JSON.parse(fs.readFileSync('./config/global.json', 'utf-8'))
-const keys = config.categories
+const cheerio = require('cheerio');
+const {getParam, getSite, parseText, parseUrl} = require('../utils');
+const config=require('../config/global.json');
 
-
-async function getSubCategories(url) {
-    const source = await getSite(url)
-    const $ = cheerio.load(source)
-    let subCategories = {}
-    $('.mocat-item').each((index, elem) => {
-        let sub = subCategories[parseText($(elem).find('.mocat-item__link').text())] = {}
-        sub.param = getParam($(elem).find('.mocat-item__link').attr('href'), keys.final)
-        sub.img = (new URL('https:' + $(elem).find('.mocat-item__body > .mocat-item__image > picture > source').attr('srcset').split(' ')[2])).toString()
-    })
-    // fs.writeFile('subCategories.json', JSON.stringify(subCategories, null, 4), (err) => {console.log(err)})
-    return subCategories
+function parseSubCategories(html, baseURL) {
+  const $=cheerio.load(String(html ?? ''));
+  const result={};
+  $('.mocat-item').each((_, el)=>{
+    const item=$(el);
+    const anchor=item.find('.mocat-item__link').first();
+    const name=parseText(anchor.text());
+    const param=getParam(anchor.attr('href'),config.categories.final);
+    const srcset=item.find('picture source').first().attr('srcset');
+    const src=srcset?.split(',')[0]?.trim().split(/\s+/)[0] || item.find('img').first().attr('src');
+    if(name && param) result[name]={param,img:parseUrl(src,baseURL)};
+  });
+  return result;
 }
-
-module.exports = {getSubCategories}
-
-// getSubCategories('https://geizhals.de/?m=1').then(res =>  console.log(res))
+async function getSubCategories(url,options={}) {
+  const source=options.html??await getSite(url,options);
+  return parseSubCategories(source,parseUrl(url) || undefined);
+}
+module.exports={getSubCategories,parseSubCategories};

@@ -1,7 +1,58 @@
 {
+  "name": "geizhals-api",
+  "version": "0.2.0",
+  "description": "Unofficial Geizhals price-comparison HTML client (early development)",
+  "main": "index.js",
+  "type": "commonjs",
+  "files": [
+    "index.js",
+    "getURL.js",
+    "utils.js",
+    "endpoints/**/*.js",
+    "helper/**/*.js",
+    "config/global.json",
+    "README.md",
+    "CONTRIBUTING.md",
+    "AGENTS.md",
+    "LICENSE",
+    "docs/**/*.md",
+    "lib/**/*.js",
+    "update-filters.js"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "demo": "node scripts/demo.js",
+    "test": "node --test",
+    "check": "node scripts/check.js",
+    "packcheck": "node scripts/packcheck.js",
+    "filters:update": "node update-filters.js"
+  },
+  "license": "GPL-3.0-only",
+  "keywords": [
+    "geizhals",
+    "price-comparison",
+    "scraper",
+    "unofficial"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Revilum/geizhals-api.git"
+  },
   "dependencies": {
-    "axios": "^0.27.2",
-    "cheerio": "^1.0.0-rc.12",
-    "puppeteer": "^16.2.0"
+    "axios": "^1.13.2",
+    "cheerio": "^1.1.2"
+  },
+  "peerDependencies": {
+    "puppeteer": "^24.0.0"
+  },
+  "peerDependenciesMeta": {
+    "puppeteer": {
+      "optional": true
+    }
+  },
+  "bin": {
+    "geizhals-update-filters": "update-filters.js"
   }
 }

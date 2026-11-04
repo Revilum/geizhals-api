@@ -1,35 +1,44 @@
-const cheerio = require('cheerio')
-const puppeteer = require('puppeteer')
+'use strict';
 
-const baseurl = 'https://geizhals.de/'
+const cheerio = require('cheerio');
+const {getSite, getFullSite, parseUrl, parsePrice} = require('../utils');
+const {getURL} = require('../getURL');
 
-function price(price) {
-  var price = price.trim().replace(',', '.').split(' ')
-  return price[1]+price[0]
+function parseSearch(html, baseURL) {
+  const $ = cheerio.load(String(html ?? ''));
+  return $('.listview__item').toArray().map(element => {
+    const row = $(element);
+    const link = row.find('.listview__name-link').first();
+    const img = row.find('.listview__image').first();
+    const availability = row.find('.listview__availability').first();
+    const offerCount = Number.parseInt(row.find('.listview__offercount-link').first().text().replace(/\D/g, ''), 10);
+    const rawRating = row.find('.listview__rating-text').first().text();
+    const discount = row.find('.discount-badge').first().text().trim();
+    const stars = Number.parseFloat(row.find('.stars-value').first().text().replace(',', '.'));
+    return {
+      name: link.text().trim(),
+      link: parseUrl(link.attr('href'), baseURL),
+      icon: parseUrl(img.attr('src') || img.attr('data-src'), baseURL),
+      price: parsePrice(row.find('.price, .gh_price').first().text()),
+      offers: Number.isNaN(offerCount) ? 0 : offerCount,
+      availability: availability.attr('aria-label') || availability.text().trim() || null,
+      discount: discount || '0%',
+      ratings: Number.parseInt(rawRating.replace(/\D/g, ''),10) || 0,
+      stars: Number.isFinite(stars) ? stars : 0
+    };
+  }).filter(item => item.name && item.link);
 }
 
-async function search(q)
-{
-  const browser = await puppeteer.launch()
-  const page = await browser.newPage();
-  await page.goto(`${baseurl}?fs=${q}`)
-  const $ = cheerio.load(await page.content())
-  browser.close()
-
-  var arr = []  
-  $('.listview__item').each(function () {
-    var item = new Object()
-    item.name = $(this).find('.listview__name-link').text().trim()
-    item.link = baseurl + $(this).find('.listview__name-link').attr('href')
-    item.icon = $(this).find('.listview__image').attr('src')
-    item.price = price($(this).find('.price').text().trim())
-    item.offers = parseInt($(this).find('.listview__offercount-link').text())
-    item.availability = $(this).find('.listview__availability').attr('aria-label').trim()
-    item.discount = $(this).find('.discount-badge').text().trim() != '' ? $(this).find('.discount-badge').text().trim().substr(1) : "0%"
-    item.ratings = $(this).find('.listview__rating-text').text() != '' ? parseInt($(this).find('.listview__rating-text').text().trim().substr(2)) : 0
-    item.stars = $(this).find('.stars-value').text() != '' ? parseFloat($(this).find('.stars-value').text()) : 0
-    arr.push(item)
-  })
-  return arr
+async function search(query, options = {}) {
+  const url = getURL({...options, type:'search', query});
+  const html = options.html ?? await (options.rendered ? getFullSite(url,options) : getSite(url,options));
+  return parseSearch(html, url);
 }
-search("AMD").then(res=>console.log("res"))
+
+async function getListing(options = {}) {
+  const url = getURL({...options, type: 'listing'});
+  const html = options.html ?? await (options.rendered ? getFullSite(url, options) : getSite(url, options));
+  return parseSearch(html, url);
+}
+
+module.exports = {search, getListing, parseSearch};
