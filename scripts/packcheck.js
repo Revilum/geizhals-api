@@ -25,7 +25,7 @@ function npm(args, cwd) {
 try {
   const [packed] = JSON.parse(npm(['pack', '--json', '--ignore-scripts', '--pack-destination', temporary], root));
   const included = new Set(packed.files.map(file => file.path));
-  for (const required of ['index.js', 'getURL.js', 'utils.js', 'endpoints/reviews.js', 'helper/getFilters.js', 'config/global.json', 'README.md', 'docs/audit.md', 'LICENSE']) {
+  for (const required of ['index.js', 'getURL.js', 'utils.js', 'endpoints/reviews.js', 'helper/getFilters.js', 'config/global.json', 'README.md', 'CONTRIBUTING.md', 'AGENTS.md', 'docs/audit.md', 'LICENSE']) {
     assert.ok(included.has(required), 'Missing packaged file: ' + required);
   }
   assert.ok(!included.has('endpoints/item.json'), 'Sample scraped output must not be packaged');

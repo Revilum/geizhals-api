@@ -91,6 +91,19 @@ test('fetchHtml bounds responses and exposes a denied status to the crawler', as
   await assert.rejects(updater.fetchHtml('/', {client: {get: async () => ({status: 200, data: {error: 'not HTML'}})}}), /HTML/);
 });
 
+test('maintenance fetch rejects explicit non-HTML media before parsing markup', async () => {
+  for (const contentType of ['application/json', 'image/svg+xml', 'application/pdf']) {
+    await assert.rejects(updater.fetchHtml('/', {client: {get: async () => ({
+      status: 200, headers: {'content-type': contentType}, data: filters()
+    })}}), /HTML/);
+  }
+  for (const contentType of ['text/html; charset=utf-8', 'application/xhtml+xml', 'text/plain']) {
+    assert.equal(await updater.fetchHtml('/', {client: {get: async () => ({
+      status: 200, headers: {'content-type': contentType}, data: filters()
+    })}}), filters());
+  }
+});
+
 test('incomplete filter pages retain previous groups and choices', async t => {
   const dir = temporary(t);
   const previous = {manufacturer: {amd: '7781_OLD_AMD', intel: '7781_Intel'}, memory: {'16': '132_16384'}};
@@ -102,7 +115,82 @@ test('incomplete filter pages retain previous groups and choices', async t => {
   assert.equal(value.manufacturer.intel, '7781_Intel');
   assert.deepEqual(value.memory, previous.memory);
   assert.equal(result.changed, 1);
+  assert.equal(result.partial, true);
+  assert.deepEqual(result.partialReasons, ['retained-existing-choices']);
   assert.ok(!fs.readdirSync(path.dirname(destination(dir))).some(name => name.includes('.tmp-')));
+});
+
+test('a complete refresh reports full coverage when no prior choice is retained', async t => {
+  const dir = temporary(t);
+  const first = await updater.refreshFilters({outputDir: dir, fetchPage: fixture(), delayMs: 0});
+  const second = await updater.refreshFilters({outputDir: dir, fetchPage: fixture(), delayMs: 0});
+  assert.equal(first.partial, false);
+  assert.equal(second.partial, false);
+  assert.equal(second.changed, 0);
+  assert.deepEqual(second.partialReasons, []);
+});
+
+test('generated filenames preserve exact category IDs for public catalog lookup', async t => {
+  const dir = temporary(t);
+  const {resolveFilterFile} = require('../getURL');
+  const ids = ['Mixed_Case', 'a'.repeat(65) + 'first', 'a'.repeat(65) + 'second'];
+  const pages = {'o:5': '<div class="mocat-item">'
+    + ids.map(id => '<a href="/?cat=' + id + '">Shared label</a>').join('') + '</div>'};
+  for (const [index, id] of ids.entries()) pages['cat:' + id] = filters([['Choice', '1_' + index]]);
+  const result = await updater.refreshFilters({outputDir: dir, fetchPage: fixture(pages), delayMs: 0});
+  assert.equal(result.parsed, ids.length);
+  assert.equal(result.files.length, ids.length);
+  for (const [index, id] of ids.entries()) {
+    const file = resolveFilterFile({filterDir: dir, cat: id});
+    assert.equal(JSON.parse(fs.readFileSync(file, 'utf8')).manufacturer.choice, '1_' + index);
+  }
+  const repeat = await updater.refreshFilters({outputDir: dir, fetchPage: fixture(pages), delayMs: 0});
+  assert.equal(repeat.changed, 0);
+  assert.equal(repeat.partial, false);
+});
+
+test('case-only catalog IDs abort the whole staged batch before writing', async t => {
+  const dir = temporary(t);
+  const pages = {'o:5': '<div class="mocat-item">'
+    + '<a href="/?cat=ordinary">Ordinary</a><a href="/?cat=Foo">Same</a><a href="/?cat=foo">Same</a></div>',
+  'cat:ordinary': filters(), 'cat:Foo': filters([['Choice', '1_UPPER']]), 'cat:foo': filters([['Choice', '1_lower']])};
+  await assert.rejects(updater.refreshFilters({outputDir: dir, fetchPage: fixture(pages), delayMs: 0}), /catalog path casing/i);
+  assert.deepEqual(fs.readdirSync(dir), []);
+});
+
+test('case-only existing catalog names are preserved and reject later refreshes', async t => {
+  const dir = temporary(t);
+  const existing = path.join(dir, 'hardware-m1', 'cpus-o5', 'same-Foo.json');
+  const original = JSON.stringify({manufacturer: {choice: '1_UPPER'}});
+  fs.mkdirSync(path.dirname(existing), {recursive: true});
+  fs.writeFileSync(existing, original);
+  const pages = {'o:5': '<div class="mocat-item"><a href="/?cat=foo">Same</a></div>',
+    'cat:foo': filters([['Choice', '1_lower']])};
+  await assert.rejects(updater.refreshFilters({outputDir: dir, fetchPage: fixture(pages), delayMs: 0}), /catalog path casing/i);
+  assert.equal(fs.readFileSync(existing, 'utf8'), original);
+  assert.deepEqual(fs.readdirSync(path.dirname(existing)), ['same-Foo.json']);
+});
+
+test('case-only staged directories are rejected even when leaf filenames differ', async t => {
+  const dir = temporary(t);
+  const pages = {'m:1': '<div class="mocat-item"><a href="/?o=Group">CPUs</a><a href="/?o=group">CPUs</a></div>',
+    'o:Group': '<div class="mocat-item"><a href="/?cat=first">First</a></div>',
+    'o:group': '<div class="mocat-item"><a href="/?cat=second">Second</a></div>',
+    'cat:first': filters(), 'cat:second': filters()};
+  await assert.rejects(updater.refreshFilters({outputDir: dir, fetchPage: fixture(pages), delayMs: 0}), /catalog path casing/i);
+  assert.deepEqual(fs.readdirSync(dir), []);
+});
+
+test('existing directory casing is checked before writing any catalog', async t => {
+  const dir = temporary(t);
+  const existingDirectory = path.join(dir, 'Hardware-m1', 'cpus-o5');
+  fs.mkdirSync(existingDirectory, {recursive: true});
+  const sentinel = path.join(existingDirectory, 'keep.json');
+  fs.writeFileSync(sentinel, 'original');
+  await assert.rejects(updater.refreshFilters({outputDir: dir, fetchPage: fixture(), delayMs: 0}), /catalog path casing/i);
+  assert.deepEqual(fs.readdirSync(dir), ['Hardware-m1']);
+  assert.deepEqual(fs.readdirSync(existingDirectory), ['keep.json']);
+  assert.equal(fs.readFileSync(sentinel, 'utf8'), 'original');
 });
 
 test('malformed later catalog stops the batch before an earlier catalog is changed', async t => {

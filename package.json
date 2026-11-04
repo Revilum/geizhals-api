@@ -12,6 +12,8 @@
     "helper/**/*.js",
     "config/global.json",
     "README.md",
+    "CONTRIBUTING.md",
+    "AGENTS.md",
     "LICENSE",
     "docs/**/*.md",
     "lib/**/*.js",

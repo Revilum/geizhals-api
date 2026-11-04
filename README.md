@@ -139,12 +139,14 @@ The weekly workflow is **opt-in**: after review/merge, a maintainer may set the 
 
 ## Development checks
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow and proposed maintainer standards, and [AGENTS.md](AGENTS.md) for scoped agent instructions.
+
 - `npm test`: deterministic offline unit/regression tests using Node's test runner, without shell globs.
 - `npm run check`: syntax-checks all JavaScript source, helpers, tests and maintenance scripts, not just the main endpoints.
 - `npm run packcheck`: actual tarball + offline consumer installation + exported API smoke test.
 - `npm audit --omit=dev --audit-level=high`: online dependency advisory check.
 
-CI is configured for Linux on Node 22/24/26 and Windows on Node 24. Fork/external PR jobs may require maintainer approval. Configuring CI is not proof that the remote jobs have passed.
+CI is configured for Linux on Node 22/24/26 and Windows on Node 24. Fork/external PR jobs may require maintainer approval. Catalog PRs created with `GITHUB_TOKEN` stay draft until a maintainer marks them Ready for review, which triggers checks; later bot updates make them draft again. Manual filter refresh must select the default branch. Configuring CI is not proof that the remote jobs have passed.
 
 ## Original README roadmap — honest coverage
 

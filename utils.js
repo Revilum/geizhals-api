@@ -60,7 +60,10 @@ function checkHtml(value, maxBytes) {
 }
 
 function checkContentType(contentType) {
-  if (contentType && !/^text\/(html|plain)\b|^application\/xhtml\+xml\b/i.test(contentType)) {
+  if (!contentType) return;
+  // Compare the complete MIME essence; a '+' or '-' starts a different subtype.
+  const mediaType = String(contentType).split(';', 1)[0].trim().toLowerCase();
+  if (!['text/html', 'text/plain', 'application/xhtml+xml'].includes(mediaType)) {
     throw new TypeError('Expected an HTML text response, not ' + contentType);
   }
 }

@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const {getFullSite} = require('../utils');
+const {getSite, getFullSite} = require('../utils');
 
 function browserResponse(contentType) {
   const state = {closed: 0, contentCalls: 0};
@@ -40,6 +40,27 @@ test('rendered fetching accepts supported HTML response media types and missing 
     const browser = browserResponse(type);
     assert.equal(await getFullSite('https://geizhals.de/', {launch: browser.launch}), '<html>document</html>');
     assert.equal(browser.state.contentCalls, 1, type);
+    assert.equal(browser.state.closed, 1, type);
+  }
+});
+
+test('fetching rejects distinct media types with HTML-like prefixes', async () => {
+  for (const type of ['text/html+json', 'text/html-extra', 'text/plain-other', 'application/xhtml+xml+json']) {
+    const client = {get: async () => ({status: 200, data: '<html/>', headers: {'content-type': type}})};
+    await assert.rejects(getSite('https://geizhals.de/', {client}), /Expected an HTML text response/, type);
+    const browser = browserResponse(type);
+    await assert.rejects(getFullSite('https://geizhals.de/', {launch: browser.launch}), /Expected an HTML text response/, type);
+    assert.equal(browser.state.contentCalls, 0, type);
+    assert.equal(browser.state.closed, 1, type);
+  }
+});
+
+test('fetching accepts exact supported media types with case, whitespace and parameters', async () => {
+  for (const type of ['Text/HTML; charset=UTF-8', ' text/html \t; charset=utf-8', 'application/xhtml+xml; charset=utf-8', 'text/plain', undefined]) {
+    const client = {get: async () => ({status: 200, data: '<html/>', headers: {'content-type': type}})};
+    assert.equal(await getSite('https://geizhals.de/', {client}), '<html/>', type);
+    const browser = browserResponse(type);
+    assert.equal(await getFullSite('https://geizhals.de/', {launch: browser.launch}), '<html>document</html>', type);
     assert.equal(browser.state.closed, 1, type);
   }
 });

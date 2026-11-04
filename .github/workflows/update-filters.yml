@@ -14,16 +14,19 @@ concurrency:
 
 jobs:
   update:
+    # Use the default branch as the stable proposal base, including manual dispatch.
     # A maintainer must opt in before weekly live requests. Manual dispatch is explicit consent.
-    if: github.event_name == 'workflow_dispatch' || vars.ENABLE_FILTER_REFRESH == 'true'
+    if: >-
+      github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+      (github.event_name == 'workflow_dispatch' || vars.ENABLE_FILTER_REFRESH == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '24'
           cache: npm
@@ -47,12 +50,15 @@ jobs:
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           echo 'Missing older choices are retained for manual review. Partial coverage is not a full inventory.' >> "$GITHUB_STEP_SUMMARY"
       - name: Propose catalog changes for human review
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7.0.11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           add-paths: filters/**/*.json
           branch: automation/geizhals-filter-refresh
           delete-branch: false
+          # GITHUB_TOKEN cannot trigger PR checks; a human ready_for_review event can.
+          # Re-draft later bot updates so every revision gets an explicit review/check step.
+          draft: always-true
           commit-message: 'chore: refresh public filter catalog'
           title: 'chore: update Geizhals filter catalog (automated)'
           body: |
@@ -60,3 +66,4 @@ jobs:
             See the workflow summary for requests, discovered catalogs and partial-coverage reasons.
             Existing choices absent from returned HTML are retained; stale choices require manual review.
             HTTP 401/403/429 abort before staged catalogs are written. No automatic merge or default-branch push.
+            Mark this draft Ready for review to trigger Node.js checks, then wait for them before merging.

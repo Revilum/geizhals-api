@@ -1,5 +1,11 @@
 # Coordinated PR work plan — 2026-11-03
 
+## Follow-up review — 2026-11-04
+
+PR #3 was rechecked at `1018eab`, repaired and reviewed in an isolated checkout. Independent owners reviewed maintenance, public API/network behavior and CI/package standards. Five code defects and one CI-trigger defect were addressed; a Windows path collision found during cross-review was repaired before delivery. The final local suite passes 94 tests, syntax checks 25 files, and demo/package/audit/workflow lint checks pass. [Review details](review-2026-11-04.md) and [current verification](verification-status.md) supersede the historical counts below.
+
+The current source-fork run at that baseline was independently confirmed to be blocked by account billing before test execution. Draft status and explicit crawler opt-in remain. Scoped contribution/agent standards were added; maintainer settings remain proposals. No global always-on process, merge, npm publication, live crawler or repository setting change is part of this follow-up.
+
 ## Goal and agreed result
 
 Deliver a runnable, verified Node.js library through PR #2, integrate its repairs with the bounded maintenance implementation in PR #3, and provide transparent Codex co-authorship for both contributions. PR #3 remains a validated draft while live filter extraction is unverified. Scheduled crawling stays disabled unless a maintainer deliberately opts in.
